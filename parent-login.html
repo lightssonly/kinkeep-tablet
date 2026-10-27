@@ -22,6 +22,20 @@ button{width:100%;border:0;background:#7457aa;color:white;padding:14px;margin-to
 button:disabled{opacity:.6;cursor:default}
 #status{margin-top:15px;min-height:24px;font-size:13px;font-weight:650;overflow-wrap:anywhere}
 footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
+
+/* v1.5 private Family Manager */
+#manager{border-top:1px solid #e8e0ef;margin-top:20px;padding-top:14px}
+#manager h2{font-size:21px;margin:8px 0 5px}
+#manager h3{font-size:16px;margin:16px 0 6px}
+#manager label{margin:11px 0 5px}
+#manager input,#manager select{font-size:14px;letter-spacing:normal;text-align:left;padding:11px;display:block;width:100%;border:1px solid #c9bfda;border-radius:10px;color:#2f2940;background:white}
+#manager button{margin-top:12px;padding:11px;font-size:14px}
+#manager button.secondary{background:#f5f0fd;color:#514276;border:1px solid #c9bfda}
+#memberList{padding:0;list-style:none;margin:8px 0;display:grid;gap:6px}
+#memberList li{font-size:13px;line-height:1.45;background:#f7f3fc;padding:11px;border-radius:10px;overflow-wrap:anywhere}
+#manager .help{font-size:12px;line-height:1.4;color:#6b6179}
+#memberStatus{font-size:13px;margin-top:10px;overflow-wrap:anywhere}
+#manager .tiny{font-size:11px;color:#756b83}
 </style>
 </head>
 <body>
@@ -36,7 +50,37 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="submit" type="submit">Verify Parent PIN</button>
 </form>
 <p id="status" aria-live="polite"></p>
-<footer>Secure Parent login test • Tablet Parent buttons are not enabled yet</footer>
+
+<section id="manager" hidden>
+<h2>🏡 Parent Family Manager</h2>
+<p>You're signed in as the registered owner. Add real family members to your KinKeep household. Changes here are stored in Supabase—not the demo Family editor.</p>
+<div class="info">🔒 Only your registered Parent session can make changes. This first version adds Youth, Teen, Adult, Caregiver, or Custom members. Additional Parent enrollment will have its own secure flow.</div>
+<h3>👥 Registered family</h3>
+<ul id="memberList"><li>Loading your family…</li></ul>
+<button type="button" class="secondary" id="refreshList">Refresh family list</button>
+<h3>➕ Add family member</h3>
+<form id="memberForm" autocomplete="off">
+<label for="display_name">Display name</label>
+<input id="display_name" name="display_name" type="text" maxlength="80" placeholder="e.g., River" required>
+<label for="avatar_uuid">Second Life avatar UUID</label>
+<input id="avatar_uuid" name="avatar_uuid" type="text" maxlength="36" spellcheck="false" autocapitalize="none" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" pattern="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}" required>
+<p class="help">Use the avatar's actual UUID, not their display name. This lets KinKeep match the member securely later.</p>
+<label for="role">Household role</label>
+<select name="role" id="role" required>
+<option value="Youth">Youth</option><option value="Teen">Teen</option><option value="Adult">Adult</option><option value="Caregiver">Caregiver / Nanny</option><option value="Custom">Custom</option>
+</select>
+<label for="custom_role_label">Relationship label (optional; required for Custom role)</label>
+<input id="custom_role_label" name="custom_role_label" maxlength="40" placeholder="e.g., Aunt, Grandma, Nanny">
+<label for="profile_emoji">Profile emoji</label>
+<select name="profile_emoji" id="profile_emoji">
+<option>🦋</option><option>🐼</option><option>🌸</option><option>🦊</option><option>⭐</option><option>🌻</option><option>🐻</option><option>🐝</option><option>🐬</option><option>🌈</option><option>🍓</option><option>🍀</option><option>🐱</option><option>🐶</option><option>🪷</option><option>🧸</option>
+</select>
+<button type="submit" id="addMember">Add Family Member</button>
+</form>
+<div id="memberStatus" role="status" aria-live="polite"></div>
+<p class="tiny">After adding a member, return to Firestorm and type <b>/984619 show</b> to refresh the tablet's live roster. One household at a time; no information is shared with other families.</p>
+</section>
+<footer>KinKeep v1.5 • Private Parent Family Manager • Shared MOAP remains read-only</footer>
 </main>
 <script>
 'use strict';
@@ -81,7 +125,11 @@ form.addEventListener('submit', async (event) => {
       form.reset();
       form.hidden = true;
       notice.textContent = '✓ Parent identity and PIN verified!';
-      statusLine.textContent = 'Success! Your secure session lasts up to 10 minutes. Tablet Parent controls will be connected in the next development stage.';
+      statusLine.textContent = 'Success! Your secure session lasts up to 10 minutes.';
+      if (approvedSession) {
+        document.getElementById('manager').hidden = false;
+        void loadMembers();
+      }
     } else {
       statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
       if (response.status === 403 && /expired|already used/i.test(statusLine.textContent)) {
@@ -101,9 +149,88 @@ form.addEventListener('submit', async (event) => {
     pinField.value = '';
   }
 });
+
+// Family management requests are NEVER sent by the shared MOAP. The session
+// token exists only in this private browser tab's memory and is hashed server-side.
+const familyEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-family';
+const manager = document.getElementById('manager');
+const memberForm = document.getElementById('memberForm');
+const memberList = document.getElementById('memberList');
+const memberStatus = document.getElementById('memberStatus');
+const addMember = document.getElementById('addMember');
+
+async function familyRequest(action, data = {}) {
+  if (!approvedSession) throw new Error('Sign in again to manage your family.');
+  const res = await fetch(familyEndpoint, {
+    method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, session_token: approvedSession, ...data }),
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok || result.ok !== true) {
+    if (res.status === 403) {
+      approvedSession = null;
+      manager.hidden = true;
+      statusLine.textContent = 'Your Parent session has ended. Type /984622 unlock in Second Life to sign in again.';
+    }
+    throw new Error(typeof result.error === 'string' ? result.error : 'The family request failed.');
+  }
+  return result;
+}
+
+async function loadMembers() {
+  memberStatus.textContent = 'Refreshing registered family…';
+  try {
+    const result = await familyRequest('list');
+    memberList.replaceChildren();
+    const members = Array.isArray(result.members) ? result.members : [];
+    if (!members.length) {
+      const li = document.createElement('li'); li.textContent = 'No registered family members yet.'; memberList.appendChild(li);
+    }
+    for (const member of members) {
+      const li = document.createElement('li');
+      const label = member.custom_role_label ? ' · ' + member.custom_role_label : '';
+      const owner = member.is_owner ? ' · Primary Parent' : '';
+      li.textContent = `${member.profile_emoji || '⭐'} ${member.display_name || 'Unnamed'} · ${member.role || 'Member'}${label}${owner}`;
+      memberList.appendChild(li);
+    }
+    memberStatus.textContent = `${members.length} active family member(s).`;
+  } catch (error) {
+    memberStatus.textContent = error instanceof Error ? error.message : 'Could not refresh family members.';
+  }
+}
+document.getElementById('refreshList').addEventListener('click', () => { void loadMembers(); });
+memberForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (addMember.disabled || !approvedSession) return;
+  const details = Object.fromEntries(new FormData(memberForm));
+  const name = String(details.display_name || '').trim();
+  const avatar = String(details.avatar_uuid || '').trim().toLowerCase();
+  const role = String(details.role || '');
+  const label = String(details.custom_role_label || '').trim();
+  const emoji = String(details.profile_emoji || '⭐');
+  if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(avatar) || !name || (role === 'Custom' && !label)) {
+    memberStatus.textContent = 'Enter a valid avatar UUID, name, and relationship label if Custom.';
+    return;
+  }
+  addMember.disabled = true;
+  memberStatus.textContent = 'Registering family member securely…';
+  try {
+    await familyRequest('add', { avatar_uuid: avatar, display_name: name, role, custom_role_label: label, profile_emoji: emoji });
+    memberForm.reset();
+    memberStatus.textContent = 'Member added to Supabase! In Firestorm, type /984619 show to update the live tablet roster.';
+    await loadMembers();
+  } catch (error) {
+    memberStatus.textContent = error instanceof Error ? error.message : 'Could not register member.';
+  } finally {
+    addMember.disabled = false;
+  }
+});
+
 window.addEventListener('pagehide', () => {
   approvedSession = null;
   ticket = null;
+  manager.hidden = true;
 });
 </script>
 </body>
