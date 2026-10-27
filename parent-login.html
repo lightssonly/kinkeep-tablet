@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>KinKeep — Private Parent Login</title>
+<style>
+:root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#302b40;background:#f1edf8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:22px;display:grid;place-items:center}
+main{width:min(100%,430px);background:white;border:1px solid #e9e1f3;border-radius:23px;padding:30px;box-shadow:0 15px 45px #352d5519}
+.brand{color:#7a59a8;font-size:14px;font-weight:800;letter-spacing:.03em}
+h1{font-size:25px;letter-spacing:-.04em;margin:8px 0 9px}
+p{font-size:14px;line-height:1.55;color:#675e78}
+.info{background:#f6f1fe;color:#564579;padding:13px;border-radius:12px;margin:18px 0;font-size:13px;line-height:1.5}
+label{display:block;margin:17px 0 7px;font-size:13px;font-weight:750}
+input{width:100%;border:1px solid #c9bfda;border-radius:12px;padding:13px;font-size:24px;letter-spacing:.3em;text-align:center;color:#2f2940;background:white}
+input:focus{outline:2px solid #977cc9;outline-offset:1px}
+button{width:100%;border:0;background:#7457aa;color:white;padding:14px;margin-top:21px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+#status{margin-top:15px;min-height:24px;font-size:13px;font-weight:650;overflow-wrap:anywhere}
+footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">✿ KinKeep</div>
+<h1>Parent Access</h1>
+<p>Enter the shared 4-digit Parent PIN. Your registered Second Life tablet has already verified the owner before opening this page.</p>
+<div class="info" id="notice" role="status">Checking your private login link…</div>
+<form id="form" autocomplete="off" hidden>
+<label for="pin">Your 4-digit Parent PIN</label>
+<input id="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" placeholder="••••" required>
+<button id="submit" type="submit">Verify Parent PIN</button>
+</form>
+<p id="status" aria-live="polite"></p>
+<footer>Secure Parent login test • Tablet Parent buttons are not enabled yet</footer>
+</main>
+<script>
+'use strict';
+const endpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-login';
+const notice = document.getElementById('notice');
+const form = document.getElementById('form');
+const statusLine = document.getElementById('status');
+const submit = document.getElementById('submit');
+const match = location.hash.match(/^#login=([a-fA-F0-9]{32})$/);
+let ticket = match ? match[1].toLowerCase() : null;
+// The server session stays only in this page's memory. It is not saved in
+// a cookie, URL, localStorage, or the public/shared in-world media browser.
+let approvedSession = null;
+if (ticket) {
+  try { history.replaceState(null, '', location.pathname); } catch { /* no persistence */ }
+  notice.textContent = 'Registered owner verified. Enter your four-digit Parent PIN.';
+  form.hidden = false;
+} else {
+  notice.textContent = 'To unlock Parent Access, type /984622 unlock in Second Life as the paired tablet owner. Open the private link it offers.';
+}
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (submit.disabled || !ticket) return;
+  const pinField = document.getElementById('pin');
+  const pin = pinField.value;
+  if (!/^[0-9]{4}$/.test(pin)) {
+    statusLine.textContent = 'Enter exactly four digits.';
+    return;
+  }
+  submit.disabled = true;
+  statusLine.textContent = 'Verifying Parent Access securely…';
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'complete', login_ticket: ticket, pin }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok && result.ok === true && result.verified === true) {
+      approvedSession = typeof result.session_token === 'string' ? result.session_token : null;
+      ticket = null;
+      form.reset();
+      form.hidden = true;
+      notice.textContent = '✓ Parent identity and PIN verified!';
+      statusLine.textContent = 'Success! Your secure session lasts up to 10 minutes. Tablet Parent controls will be connected in the next development stage.';
+    } else {
+      statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
+      if (response.status === 403 && /expired|already used/i.test(statusLine.textContent)) {
+        ticket = null;
+        form.hidden = true;
+      } else if (response.status === 423) {
+        ticket = null;
+        form.hidden = true;
+      } else {
+        submit.disabled = false;
+      }
+    }
+  } catch {
+    statusLine.textContent = 'Connection error. Check the Parent Login Edge Function and try again.';
+    submit.disabled = false;
+  } finally {
+    pinField.value = '';
+  }
+});
+window.addEventListener('pagehide', () => {
+  approvedSession = null;
+  ticket = null;
+});
+</script>
+</body>
+</html>
