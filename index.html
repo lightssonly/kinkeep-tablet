@@ -26,10 +26,11 @@ let page='home',personId=null,activeId=db.members[0]?.id||'',rosterPage=0,messag
 // Phase 2 v0.9: public-on-screen READ-ONLY roster snapshot from LSL.
 // This URL fragment must never contain credentials, UUIDs, PINs or private chores.
 // It is for display ONLY; it cannot grant roles or Parent permissions.
-let liveRoster=null;
-try {
-  const fragment=window.location.hash;
-  if(fragment.startsWith('#kkroster=')) {
+// Read the public, read-only roster snapshot from the MOAP URL fragment.
+// Device secrets are NEVER put in this URL and cannot grant Parent access.
+function parseRosterFragment(fragment) {
+  try {
+    if (!fragment.startsWith('#kkroster=')) return null;
     const encoded=fragment.slice('#kkroster='.length);
     const bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));
     const source=JSON.parse(new TextDecoder().decode(bytes));
@@ -37,14 +38,26 @@ try {
        Number.isInteger(source.total) && source.total>=0 && Number.isInteger(source.page) &&
        source.page>=1 && source.page<=50 && Number.isInteger(source.returned) &&
        source.returned===source.members.length) {
-      liveRoster={page:source.page,total:source.total,members:source.members.map(m=>({
+      return {page:source.page,total:source.total,members:source.members.map(m=>({
         name:String(m.display_name||'Family member').slice(0,80),
         role:String(m.role||'Member').slice(0,32),
         emoji:String(m.profile_emoji||'⭐').slice(0,16)
       }))};
     }
-  }
-} catch (_err) { liveRoster=null; }
+  } catch (_err) { /* Keep demo UI if payload is invalid. */ }
+  return null;
+}
+let lastRosterFragment=window.location.hash;
+let liveRoster=parseRosterFragment(lastRosterFragment);
+// MOAP may navigate to a new #fragment without refreshing the entire webpage.
+// Handle both normal browser hash events and Firestorm viewers that miss the event.
+function syncRosterFromScreenUrl() {
+  const fragment=window.location.hash;
+  if (fragment===lastRosterFragment) return;
+  lastRosterFragment=fragment;
+  liveRoster=parseRosterFragment(fragment);
+  render();
+}
 function liveRosterTiles() {
   if(!liveRoster) return '';
   const tiles=liveRoster.members.map(m=>`<div class="profile" aria-label="Live family member"><span class="icon">${esc(m.emoji)}</span><b>${esc(m.name)}</b><span class="muted">${esc(m.role)}</span></div>`).join('');
@@ -109,5 +122,7 @@ if(f.id==='appearance'){if(!requireGrant('settings'))return;db.family=val('famil
 document.addEventListener('click',handleClick);
 document.addEventListener('submit',e=>{handleSubmit(e).catch(err=>announce('An unexpected error occurred: '+err.message))});
 document.addEventListener('change',e=>{if(e.target.id==='actor'){activeId=e.target.value;unlockUntil=0;message='Switched demo profile; elevated access locked.';page='home';render()}if(e.target.id==='selfEmoji'){let m=byId(e.target.dataset.target);if(m&&m.id===activeId){m.emoji=e.target.value;store();render()}}});
+window.addEventListener('hashchange',syncRosterFromScreenUrl);
+setInterval(syncRosterFromScreenUrl,1000);
 render();setInterval(updateClock,30000);
 </script></body></html>
