@@ -36,6 +36,27 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 #manager .help{font-size:12px;line-height:1.4;color:#6b6179}
 #memberStatus{font-size:13px;margin-top:10px;overflow-wrap:anywhere}
 #manager .tiny{font-size:11px;color:#756b83}
+
+/* v1.7 private, real Supabase Chores Manager */
+#choresManager{border-top:1px solid #e7dfef;padding-top:18px;margin-top:24px}
+#choresManager h2{font-size:20px;margin:5px 0}
+#choresManager h3{font-size:16px;margin:16px 0 8px}
+#choresManager textarea{width:100%;min-height:84px;resize:vertical;padding:12px;border-radius:10px;border:1px solid #c9bfda;font:inherit;color:#2f2940}
+#choresManager input[type=date],#choresManager input[type=number]{font-size:14px;letter-spacing:normal;text-align:left}
+#choresManager .choreGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#choresManager .choreGrid>*{min-width:0}
+#choresManager .choreCard{border:1px solid #e4dcee;border-radius:12px;padding:12px;background:#faf8fd;margin:9px 0}
+#choresManager .choreCard p{margin:6px 0}
+#choresManager .choreMeta{font-size:12px;color:#665b77;line-height:1.5}
+#choresManager .chorePill{display:inline-block;padding:3px 8px;border-radius:100px;background:#eae1f5;color:#514276;font-size:11px;font-weight:800}
+#choresManager .chorePill.approved{background:#e2f4e8;color:#21683f}
+#choresManager .chorePill.submitted{background:#fff0d5;color:#8f590e}
+#choresManager .reviewBtns{display:flex;gap:8px}
+#choresManager .reviewBtns button{flex:1;margin-top:8px}
+#choresManager .reviewBtns .redo{background:#eee6f7;color:#514276}
+#choresManager .summary{padding:11px;background:#f6f1fe;border-radius:10px;font-size:12px;color:#514276;line-height:1.7}
+#choreStatus{margin-top:10px;font-size:13px;overflow-wrap:anywhere}
+@media(max-width:390px){#choresManager .choreGrid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -79,8 +100,41 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 </form>
 <div id="memberStatus" role="status" aria-live="polite"></div>
 <p class="tiny">After adding a member, return to Firestorm and type <b>/984619 show</b> to refresh the tablet's live roster. One household at a time; no information is shared with other families.</p>
+
+
+<section id="choresManager">
+  <h2>🧹 Real Chore Assignments</h2>
+  <p>Assign real chores to registered Youth and Teen avatars. These are saved in your Supabase household, not the tablet's old demo chore list.</p>
+  <div class="info">🔐 Owner-only pilot: a verified Parent session is required. Each assignment has its own status, points, and optional SLT due date. Youth/Teen self-submission will be added in the next development phase.</div>
+  <h3>➕ Assign a chore</h3>
+  <form id="choreAssignForm" autocomplete="off">
+    <label for="choreRecipient">Assign to</label>
+    <select id="choreRecipient" required><option value="">Loading eligible family members…</option></select>
+    <label for="choreTitle">Chore</label>
+    <input id="choreTitle" maxlength="150" required list="choreSuggestions" placeholder="e.g., Wash the dishes">
+    <datalist id="choreSuggestions">
+      <option value="Wash the dishes"><option value="Clean the bathroom"><option value="Put away laundry">
+      <option value="Tidy your bedroom"><option value="Take out the trash"><option value="Finish homework">
+      <option value="Feed the pets"><option value="Mop the floor"><option value="Put away toys">
+    </datalist>
+    <label for="choreInstructions">Instructions (optional)</label>
+    <textarea id="choreInstructions" maxlength="1000" placeholder="What should they do to complete this chore?"></textarea>
+    <div class="choreGrid">
+      <div><label for="chorePoints">Reward points</label><input id="chorePoints" type="number" min="0" max="10000" step="1" value="10" required></div>
+      <div><label for="choreDue">Due date (SLT, optional)</label><input id="choreDue" type="date"></div>
+    </div>
+    <p class="help">SLT uses Pacific time. If you choose a date, the chore is due at 11:59 p.m. SLT that day. Points are earned after Parent approval, not when the chore is first assigned.</p>
+    <button id="choreAssignButton" type="submit">Assign Chore</button>
+  </form>
+  <div id="choreStatus" aria-live="polite" role="status"></div>
+  <h3>📋 Household chores</h3>
+  <button type="button" class="secondary" id="refreshChores">Refresh chore list</button>
+  <p class="help">Recent 100 chores appear below. Pending review means a child has submitted the chore. Approve or request redo will work when the secure submission feature is built.</p>
+  <div id="choreSummary" class="summary">Loading household chores…</div>
+  <div id="choreList" aria-live="polite"></div>
 </section>
-<footer>KinKeep v1.5 • Private Parent Family Manager • Shared MOAP remains read-only</footer>
+</section>
+<footer>KinKeep v1.7 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
 </main>
 <script>
 'use strict';
@@ -129,6 +183,7 @@ form.addEventListener('submit', async (event) => {
       if (approvedSession) {
         document.getElementById('manager').hidden = false;
         void loadMembers();
+        void loadChores();
       }
     } else {
       statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
@@ -220,12 +275,175 @@ memberForm.addEventListener('submit', async event => {
     memberForm.reset();
     memberStatus.textContent = 'Member added to Supabase! In Firestorm, type /984619 show to update the live tablet roster.';
     await loadMembers();
+    await loadChores();
   } catch (error) {
     memberStatus.textContent = error instanceof Error ? error.message : 'Could not register member.';
   } finally {
     addMember.disabled = false;
   }
 });
+
+
+// KinKeep v1.7 — real chores remain ONLY in the private Parent browser tab.
+// approvedSession is created by the existing verified, owner-bound PIN login.
+const choreEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-chores';
+const choreForm = document.getElementById('choreAssignForm');
+const choreRecipient = document.getElementById('choreRecipient');
+const choreStatus = document.getElementById('choreStatus');
+const choreList = document.getElementById('choreList');
+const choreSummary = document.getElementById('choreSummary');
+const choreAssignButton = document.getElementById('choreAssignButton');
+const choreRefreshButton = document.getElementById('refreshChores');
+
+async function choreRequest(action, data = {}) {
+  if (!approvedSession) throw new Error('Sign in again to manage chores.');
+  const res = await fetch(choreEndpoint, {
+    method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, session_token: approvedSession, ...data }),
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok || result.ok !== true) {
+    if (res.status === 403) {
+      approvedSession = null;
+      manager.hidden = true;
+      statusLine.textContent = 'Parent session expired or locked. Type /984622 unlock in Second Life to sign in again.';
+    }
+    throw new Error(typeof result.error === 'string' ? result.error : 'Chore request failed.');
+  }
+  return result;
+}
+
+function newEl(tag, className, content) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (content != null) el.textContent = String(content);
+  return el;
+}
+function displaySlt(iso) {
+  if (!iso) return 'No due date';
+  try {
+    const dt = new Date(iso);
+    if (Number.isNaN(dt.valueOf())) return 'Due date unavailable';
+    return 'Due ' + new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles', month:'short', day:'numeric', year:'numeric',
+      hour:'numeric', minute:'2-digit'
+    }).format(dt) + ' SLT';
+  } catch { return 'Due date unavailable'; }
+}
+const statusLabels = { todo: 'To do', started: 'Started', submitted: 'Waiting for Parent', redo: 'Redo requested', approved: 'Approved' };
+
+async function loadChores() {
+  if (!approvedSession) return;
+  choreStatus.textContent = 'Refreshing real chores…';
+  choreRefreshButton.disabled = true;
+  try {
+    const data = await choreRequest('list');
+    const people = Array.isArray(data.members) ? data.members : [];
+    const chores = Array.isArray(data.chores) ? data.chores : [];
+    const previous = choreRecipient.value;
+    choreRecipient.replaceChildren();
+    if (!people.length) {
+      choreRecipient.appendChild(newEl('option', '', 'Add a Youth or Teen in Family Manager first.'));
+      choreRecipient.disabled = true;
+      choreAssignButton.disabled = true;
+    } else {
+      for (const m of people) {
+        const opt = newEl('option', '', `${m.profile_emoji || '⭐'} ${m.display_name || 'Member'} · ${m.role || ''}`);
+        opt.value = String(m.id || '');
+        choreRecipient.appendChild(opt);
+      }
+      if ([...choreRecipient.options].some(o => o.value === previous)) choreRecipient.value = previous;
+      choreRecipient.disabled = false;
+      choreAssignButton.disabled = false;
+    }
+    const waiting = chores.filter(c => c.status === 'submitted').length;
+    const active = chores.filter(c => ['todo', 'started', 'redo'].includes(c.status)).length;
+    const approved = chores.filter(c => c.status === 'approved').length;
+    const pointSummary = people.map(m => `${m.profile_emoji || '⭐'} ${m.display_name || 'Member'}: ${Number(m.earned_points || 0)} earned`).join('  •  ');
+    choreSummary.textContent = `${active} active · ${waiting} awaiting review · ${approved} approved` + (pointSummary ? `
+${pointSummary}` : '');
+    choreSummary.style.whiteSpace = 'pre-line';
+    choreList.replaceChildren();
+    if (!chores.length) choreList.appendChild(newEl('p', 'help', 'No real chores yet. Assign your first one above!'));
+    for (const c of chores) {
+      const card = newEl('article', 'choreCard');
+      const h = newEl('strong', '', `${c.member_emoji || '⭐'} ${c.member_name || 'Member'} — ${c.title || 'Chore'}`);
+      card.appendChild(h);
+      const status = String(c.status || 'todo');
+      card.appendChild(document.createTextNode(' '));
+      card.appendChild(newEl('span', 'chorePill ' + status, statusLabels[status] || status));
+      card.appendChild(newEl('p', 'choreMeta', `${Number(c.points || 0)} points · ${displaySlt(c.due_at)}`));
+      if (c.instructions) card.appendChild(newEl('p', '', c.instructions));
+      if (c.review_note) card.appendChild(newEl('p', 'choreMeta', 'Parent note: ' + c.review_note));
+      if (status === 'submitted') {
+        const note = newEl('textarea');
+        note.maxLength = 500;
+        note.placeholder = 'Optional approval note; required if requesting redo';
+        note.setAttribute('aria-label', `Review note for ${c.title || 'chore'}`);
+        card.appendChild(note);
+        const actions = newEl('div', 'reviewBtns');
+        const approve = newEl('button', '', 'Approve');
+        const redo = newEl('button', 'redo', 'Request Redo');
+        approve.type = redo.type = 'button';
+        approve.addEventListener('click', () => { void reviewChore(c.id, 'approve', note.value, [approve, redo]); });
+        redo.addEventListener('click', () => { void reviewChore(c.id, 'redo', note.value, [approve, redo]); });
+        actions.append(approve, redo);
+        card.appendChild(actions);
+      }
+      choreList.appendChild(card);
+    }
+    choreStatus.textContent = `Chore list refreshed. ${chores.length} recent assignment(s).`;
+  } catch (err) {
+    choreStatus.textContent = err instanceof Error ? err.message : 'Unable to load chores.';
+  } finally {
+    choreRefreshButton.disabled = false;
+  }
+}
+async function reviewChore(choreId, action, note, buttons) {
+  if (action === 'redo' && !String(note || '').trim()) {
+    choreStatus.textContent = 'Please explain what needs to be redone.';
+    return;
+  }
+  if (action === 'approve' && !confirm('Approve this submitted chore and award its points?')) return;
+  buttons.forEach(b => { b.disabled = true; });
+  try {
+    await choreRequest(action, { chore_id: choreId, review_note: note.trim() });
+    await loadChores();
+    choreStatus.textContent = action === 'approve' ? 'Chore approved and points counted!' : 'Redo requested and recorded.';
+  } catch (err) {
+    choreStatus.textContent = err instanceof Error ? err.message : 'Unable to review chore.';
+    buttons.forEach(b => { b.disabled = false; });
+  }
+}
+choreForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!approvedSession || choreAssignButton.disabled) return;
+  const member = choreRecipient.value;
+  const title = document.getElementById('choreTitle').value.trim();
+  const instructions = document.getElementById('choreInstructions').value.trim();
+  const points = Number(document.getElementById('chorePoints').value);
+  const due = document.getElementById('choreDue').value;
+  if (!member || title.length < 1 || title.length > 150 || !Number.isInteger(points) || points < 0 || points > 10000) {
+    choreStatus.textContent = 'Choose a Youth/Teen, a chore title, and whole-number points (0–10000).';
+    return;
+  }
+  choreAssignButton.disabled = true;
+  choreStatus.textContent = 'Saving real chore to Supabase…';
+  try {
+    await choreRequest('assign', { member_id: member, title, instructions, points, due_slt_date: due });
+    document.getElementById('choreTitle').value = '';
+    document.getElementById('choreInstructions').value = '';
+    document.getElementById('choreDue').value = '';
+    await loadChores();
+    choreStatus.textContent = 'Chore saved to Supabase! The Youth/Teen submission screen is our next feature.';
+  } catch (err) {
+    choreStatus.textContent = (err instanceof Error ? err.message : 'Could not save chore.') + ' If the network failed, refresh the list before trying again to avoid duplicates.';
+  } finally {
+    if (approvedSession && !choreRecipient.disabled) choreAssignButton.disabled = false;
+  }
+});
+choreRefreshButton.addEventListener('click', () => { void loadChores(); });
 
 window.addEventListener('pagehide', () => {
   approvedSession = null;
