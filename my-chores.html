@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://qnbnxgaxciqcsszfwsly.supabase.co; base-uri 'none'; form-action 'none'">
+<title>KinKeep — My Chores</title>
+<style>
+:root{font-family:system-ui,'Segoe UI',sans-serif;color:#2d2940;background:#eee8f8}
+*{box-sizing:border-box}body{margin:0;padding:20px;min-height:100vh}
+main{width:min(100%,650px);margin:0 auto;background:white;border-radius:23px;padding:25px;box-shadow:0 14px 35px #33244c19}
+.brand{font-weight:850;color:#7353a8;letter-spacing:.3px;font-size:14px}
+h1{margin:9px 0;font-size:30px;letter-spacing:-1px}h2{margin:16px 0 7px;font-size:21px}
+p{line-height:1.55;color:#665e76;font-size:13px}
+.notice{background:#f3ebff;color:#58457a;padding:13px 14px;border-radius:13px;font-size:13px;line-height:1.5}
+.member{display:flex;gap:12px;align-items:center;margin:13px 0;padding:13px;border:1px solid #e3d9f0;border-radius:14px}
+.emoji{font-size:29px;background:#f1eafa;padding:8px;border-radius:12px}
+.member b{display:block;font-size:18px}.member small{color:#6e6580}
+.chore{padding:16px;border-radius:16px;border:1px solid #e6ddec;margin:12px 0;background:#fdfbff}
+.chorehead{display:flex;gap:8px;justify-content:space-between;align-items:start}.chorehead h3{margin:0;font-size:17px}
+.pill{display:inline-block;border-radius:20px;background:#e9e1fa;color:#5e4786;font-size:11px;font-weight:800;padding:5px 9px;white-space:nowrap}
+.pill.approved{background:#dff4e7;color:#246c46}.pill.submitted{background:#fff0d6;color:#865b1f}
+.meta{font-size:12px;color:#665d76;margin-top:9px} .instruction{white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{padding:24px;text-align:center;border:1px dashed #d8c9e9;border-radius:14px;color:#64577c}
+footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
+</style>
+</head>
+<body><main>
+<div class="brand">✿ KinKeep · PRIVATE FAMILY VIEW</div>
+<h1>My Chores 🧹</h1>
+<p id="status" class="notice" role="status" aria-live="polite">Checking your one-time private link…</p>
+<section id="content" hidden>
+  <div id="member" class="member"></div>
+  <h2>Your assigned chores</h2>
+  <div id="list"></div>
+  <p class="notice">This is a read-only view. You'll be able to submit completed chores from here after we add secure Youth/Teen completion in the next update.</p>
+</section>
+<footer>KinKeep v1.8 · Private view · Never share your login link</footer>
+</main>
+<script>
+'use strict';
+const endpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-my-chores';
+const status=document.getElementById('status');
+const content=document.getElementById('content');
+const list=document.getElementById('list');
+const member=document.getElementById('member');
+const match=location.hash.match(/^#ticket=([a-fA-F0-9]{32})$/);
+const ticket=match?match[1].toLowerCase():null;
+try {history.replaceState(null,'',location.pathname);} catch(e) { /* fragment is never sent as HTTP referrer */ }
+const labels={todo:'To do',started:'In progress',submitted:'Awaiting Parent',redo:'Needs redo',approved:'Approved'};
+function el(tag,cls,text) {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;}
+function fmtDate(d){if(!d)return'No due date';const parsed=new Date(d);if(!Number.isFinite(parsed.getTime()))return'No due date';return new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',month:'short',day:'numeric',year:'numeric'}).format(parsed)+' SLT';}
+async function load(){
+ if(!ticket){status.textContent='To see your chores, stand near your Second Life tablet and type /984625 chores as a registered Youth or Teen.';return;}
+ try{
+  const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({action:'redeem',ticket})});
+  const body=await response.json();
+  if(!response.ok||body.ok!==true)throw Error(body.error||'Could not load your chores');
+  const m=body.member||{};
+  const icon=el('span','emoji',String(m.profile_emoji||'⭐').slice(0,16));
+  const detail=el('div');detail.append(el('b','',m.display_name||'Family member'),el('small','',m.role||'Youth'));
+  member.append(icon,detail);
+  const chores=Array.isArray(body.chores)?body.chores:[];
+  if(!chores.length){list.append(el('div','empty','No chores assigned yet. Enjoy your free time! 🌈'));}
+  else for(const chore of chores){
+    const card=el('article','chore');const head=el('div','chorehead');
+    const h=el('h3','',chore.title||'Untitled chore');
+    const badge=el('span','pill '+String(chore.status||'').replace(/[^a-z]/g,''),labels[chore.status]||'Assigned');
+    head.append(h,badge);card.append(head);
+    if(chore.instructions)card.append(el('p','instruction',chore.instructions));
+    card.append(el('div','meta',String(chore.points??0)+' ⭐ points · '+fmtDate(chore.due_at)));
+    if(chore.review_note)card.append(el('p','notice','Parent note: '+chore.review_note));
+    list.append(card);
+  }
+  status.textContent='Your private chore list is ready. Only this registered avatar’s chores were retrieved.';
+  content.hidden=false;
+ }catch(e){status.textContent=(e instanceof Error?e.message:'Could not load your chores')+' — Request a new private link from Second Life.';}
+}
+load();
+</script>
+</body></html>
