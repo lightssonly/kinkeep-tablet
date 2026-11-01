@@ -129,12 +129,12 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
   <div id="choreStatus" aria-live="polite" role="status"></div>
   <h3>📋 Household chores</h3>
   <button type="button" class="secondary" id="refreshChores">Refresh chore list</button>
-  <p class="help">Recent 100 chores appear below. Pending review means a child has submitted the chore. Approve or request redo will work when the secure submission feature is built.</p>
+  <p class="help">Recent 100 chores appear below. Pending review means a child submitted the chore. You can now Approve (count points) or request Redo with a note.</p>
   <div id="choreSummary" class="summary">Loading household chores…</div>
   <div id="choreList" aria-live="polite"></div>
 </section>
 </section>
-<footer>KinKeep v1.7 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
+<footer>KinKeep v1.9 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
 </main>
 <script>
 'use strict';
@@ -376,6 +376,7 @@ ${pointSummary}` : '');
       card.appendChild(newEl('p', 'choreMeta', `${Number(c.points || 0)} points · ${displaySlt(c.due_at)}`));
       if (c.instructions) card.appendChild(newEl('p', '', c.instructions));
       if (c.review_note) card.appendChild(newEl('p', 'choreMeta', 'Parent note: ' + c.review_note));
+      if (c.submission_note) card.appendChild(newEl('p', 'choreMeta', 'Youth completion note: ' + c.submission_note));
       if (status === 'submitted') {
         const note = newEl('textarea');
         note.maxLength = 500;
@@ -436,7 +437,7 @@ choreForm.addEventListener('submit', async event => {
     document.getElementById('choreInstructions').value = '';
     document.getElementById('choreDue').value = '';
     await loadChores();
-    choreStatus.textContent = 'Chore saved to Supabase! The Youth/Teen submission screen is our next feature.';
+    choreStatus.textContent = 'Chore saved to Supabase! Your Youth or Teen can now submit it from their private My Chores page.';
   } catch (err) {
     choreStatus.textContent = (err instanceof Error ? err.message : 'Could not save chore.') + ' If the network failed, refresh the list before trying again to avoid duplicates.';
   } finally {
