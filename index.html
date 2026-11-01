@@ -1,272 +1,130 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>KinKeep — Landscape Family Tablet</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://qnbnxgaxciqcsszfwsly.supabase.co; base-uri 'none'; form-action 'none'">
+<title>KinKeep — My Chores</title>
 <style>
-:root{--accent:#8165b8;--ink:#29243c;--bg:#f2e7fb;--card:#ffffffed;--wall:linear-gradient(140deg,#fce6f0,#e5ddff)}
-*{box-sizing:border-box}body{margin:0;background:#d9d3e5;font:15px/1.4 system-ui,'Segoe UI',sans-serif;color:var(--ink)}button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;background:var(--accent);color:white;padding:10px 13px;border-radius:12px;font-weight:600}button.secondary{background:#fff;color:var(--ink);border:1px solid #cfc5d8}button.ghost{background:transparent;color:var(--accent);padding:6px 9px}button.danger{background:#a94c68}button:disabled{opacity:.4;cursor:not-allowed}button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid #5389bd;outline-offset:1px}
-.shell{width:min(100%,530px);min-height:100vh;margin:auto;background:linear-gradient(#ffffff8f,#ffffff8f),var(--wall),var(--bg);background-size:cover;background-position:center;box-shadow:0 3px 28px #0003;padding:15px 15px 35px}.bar,.spread,.nav{display:flex;justify-content:space-between;align-items:center;gap:8px}.bar{font-weight:800;margin-bottom:11px}.brand{font-size:18px}.muted{font-size:12px;color:#696379}.note{background:#fff6d9;border:1px solid #efdfb1;padding:10px 12px;border-radius:12px;font-size:12px}.card{border-radius:19px;background:var(--card);padding:15px;margin:12px 0;box-shadow:0 4px 16px #0000000c;border:1px solid #ffffffbe}.hero{background:linear-gradient(125deg,var(--accent),#405575);color:#fff;padding:19px}.hero h1{font-size:40px;margin:6px 0}.hero .muted{color:#f1ecff}h2{margin:6px 0 13px;font-size:23px}h3{margin:6px 0 9px;font-size:17px}p{margin:8px 0 12px}.apps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.apps button{background:#fffffff2;color:var(--ink);padding:13px 3px;min-height:86px;font-size:13px}.apps .icon{font-size:27px;display:block}.profiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}.profile{border:1px solid #ddd1eb;border-radius:12px;background:white;color:var(--ink);padding:8px 3px;min-width:0;font-size:11px;font-weight:500}.profile .icon{font-size:26px;display:block}.profile b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.stack{display:grid;gap:11px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.field{display:grid;gap:4px;font-size:13px;font-weight:650}input:not([type=checkbox]),textarea,select{border:1px solid #cac0d8;border-radius:10px;background:#fff;padding:10px;color:var(--ink);width:100%;min-width:0}textarea{min-height:75px;resize:vertical}.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.pill{background:#eee9f5;color:#4c4560;border-radius:25px;padding:4px 8px;font-size:11px;display:inline-block}.subtle{background:#f6f1fa;border-radius:12px;padding:11px}.nav{margin:8px 0 13px}.nav b{font-size:13px}.mini{padding:7px 9px;font-size:12px}.wall{height:88px;display:flex;justify-content:center;align-items:end;text-shadow:0 1px 3px #fff;color:#29243c;border:2px solid #fff}.divider{height:1px;background:#e7ddec;margin:12px 0}.check{display:flex;align-items:center;gap:8px;font-weight:500}.check input{width:auto}.action-list{display:grid;gap:8px}.action-list>div{background:#faf7fd;border-radius:10px;padding:10px}.emoji-picker{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:5px}.emoji-picker button{background:#fff;color:#3b3449;border:1px solid #e0d7ec;padding:7px 0;font-size:21px}.emoji-picker button.active{border:3px solid var(--accent)}.status{color:#54445b;font-weight:650;font-size:12px}.hide{display:none}.toolbar{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.toolbar>*{flex:1}.secondaryline{background:#fff9; border-radius:12px;padding:10px}.small{font-size:12px}.black{color:#332f40}footer{margin-top:16px;text-align:center;font-size:11px;color:#655b73}.intro{font-size:12px;background:#fff;padding:10px;border-radius:10px;margin-top:8px}
-@media(max-width:375px){.shell{padding:10px}.apps{gap:6px}.card{padding:12px}.hero h1{font-size:34px}.profile .icon{font-size:21px}.mini{font-size:11px}}
+:root{font-family:system-ui,'Segoe UI',sans-serif;color:#2d2940;background:#eee8f8}
+*{box-sizing:border-box}body{margin:0;padding:20px;min-height:100vh}
+main{width:min(100%,650px);margin:0 auto;background:white;border-radius:23px;padding:25px;box-shadow:0 14px 35px #33244c19}
+.brand{font-weight:850;color:#7353a8;letter-spacing:.3px;font-size:14px}
+h1{margin:9px 0;font-size:30px;letter-spacing:-1px}h2{margin:16px 0 7px;font-size:21px}
+p{line-height:1.55;color:#665e76;font-size:13px}
+.notice{background:#f3ebff;color:#58457a;padding:13px 14px;border-radius:13px;font-size:13px;line-height:1.5}
+.member{display:flex;gap:12px;align-items:center;margin:13px 0;padding:13px;border:1px solid #e3d9f0;border-radius:14px}
+.emoji{font-size:29px;background:#f1eafa;padding:8px;border-radius:12px}
+.member b{display:block;font-size:18px}.member small{color:#6e6580}
+.chore{padding:16px;border-radius:16px;border:1px solid #e6ddec;margin:12px 0;background:#fdfbff}
+.chorehead{display:flex;gap:8px;justify-content:space-between;align-items:start}.chorehead h3{margin:0;font-size:17px}
+.pill{display:inline-block;border-radius:20px;background:#e9e1fa;color:#5e4786;font-size:11px;font-weight:800;padding:5px 9px;white-space:nowrap}
+.pill.approved{background:#dff4e7;color:#246c46}.pill.submitted{background:#fff0d6;color:#865b1f}
+.meta{font-size:12px;color:#665d76;margin-top:9px} .instruction{white-space:pre-wrap;overflow-wrap:anywhere}
+.empty{padding:24px;text-align:center;border:1px dashed #d8c9e9;border-radius:14px;color:#64577c}
+footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
+.submitArea{margin-top:14px;border-top:1px solid #e4dcec;padding-top:12px}
+.submitArea label{display:block;font-weight:700;font-size:12px;margin:0 0 6px;color:#55496e}
+.submitArea textarea{width:100%;resize:vertical;border:1px solid #c9bcde;border-radius:9px;min-height:62px;padding:9px;font:inherit;font-size:13px}
+.submitArea button{margin-top:9px;border:0;border-radius:10px;background:#7251a5;color:white;padding:10px 16px;font-size:13px;font-weight:800;cursor:pointer}
+.submitArea button:disabled{opacity:.5;cursor:wait}
+.submitArea .result{font-size:12px;color:#4c4472;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
 
-/* === KinKeep v1.6: 16:9 landscape skin. No changes to device/roster/session logic. === */
-:root{--soft:#f8f5fd;--line:#e8e0f2;--ink:#28243c;--sub:#6c6680}
-html{height:100%;scroll-behavior:smooth}
-body{min-height:100%;background:#ded8e9;font-size:14px;line-height:1.4}
-.shell{width:100%;max-width:1280px;min-height:100vh;margin:0 auto;padding:15px 19px 12px;background:linear-gradient(#fffffff0,#fffffff0),var(--wall),var(--bg);box-shadow:0 10px 38px #30204e17}
-.bar{height:43px;margin:0 0 12px;padding:0 5px 10px;border-bottom:1px solid #a693b32d}
-.brand{font-size:21px;letter-spacing:-.7px;display:inline-flex;align-items:center;gap:9px}
-.brand .muted{font-weight:650;font-size:11px;letter-spacing:.1px;background:#ffffffbd;padding:5px 9px;border-radius:25px;border:1px solid #d8cfea}
-#sltBar{font-size:13px;font-weight:750;background:#fff;padding:7px 12px;border:1px solid var(--line);border-radius:12px;color:#4e456b}
-.card{margin:0 0 12px;border-radius:18px;box-shadow:0 3px 13px #32234b0d;border:1px solid #ffffffd9;background:#fffdfded;padding:16px}
-button{transition:transform .12s,background-color .12s,box-shadow .12s}
-button:active{transform:scale(.982)}
-button.secondary{background:#f9f6fe}
-button.mini{padding:9px 12px}
-.nav{background:#ffffffc4;padding:9px 13px;margin:0 0 12px;border:1px solid var(--line);border-radius:14px}
-.nav b{font-size:15px}
-footer{font-size:10px;margin-top:10px;padding-bottom:0;color:#6d617e}
-/* Home is a balanced two-column family dashboard, built for 1024x576 MOAP. */
-.home-landscape{display:grid;grid-template-columns:minmax(0,1.04fr) minmax(0,.96fr);gap:14px;align-items:start}
-.home-col{display:grid;gap:12px;min-width:0}
-.home-col .card{margin:0}
-.home-hero{position:relative;overflow:hidden;min-height:185px;background:linear-gradient(118deg,#5a4b9a 0%,var(--accent) 56%,#8b9cc2 125%);color:white;padding:20px 23px}
-.home-hero:after{content:'✦';position:absolute;right:-24px;top:-50px;font-size:200px;opacity:.1;pointer-events:none}
-.home-eyebrow{display:flex;gap:7px;align-items:center;letter-spacing:.55px;font-size:12px;color:#f5ecff;font-weight:650}
-.home-hero h1{font-size:62px;line-height:1;letter-spacing:-2.5px;margin:11px 0 8px;font-weight:800}
-.home-hero #date{font-size:13px;font-weight:650;color:#f6f0ff}
-.weather-demo{margin-top:15px;font-size:11px;display:inline-flex;gap:7px;align-items:center;background:#ffffff26;border:1px solid #ffffff3a;border-radius:30px;padding:7px 10px}
-.home-app-panel{padding:15px 17px 16px}
-.home-app-panel h3{margin:0 0 12px;font-size:16px}
-.home-apps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.home-apps button{min-width:0;min-height:80px;padding:11px 5px 9px;border-radius:14px;background:var(--soft);color:var(--ink);border:1px solid #eee8f7;font-size:12px;font-weight:760;display:grid;place-items:center;align-content:center;gap:4px}
-.home-apps button:hover{background:#eee8ff;box-shadow:0 3px 12px #735f9b13}
-.home-apps .icon{font-size:24px;line-height:1.1;display:block}
-.home-family{padding:17px 17px 15px;min-height:250px}
-.home-family h3{margin:0;font-size:18px}
-.home-family .profiles{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px}
-.home-family .profile{display:grid;grid-template-columns:42px minmax(0,1fr);grid-template-rows:24px 18px;text-align:left;align-items:center;gap:0 7px;padding:10px 11px;border:1px solid #eae3f4;border-radius:13px;min-height:69px;max-height:69px}
-.home-family .profile .icon{grid-column:1;grid-row:1/3;display:grid;place-items:center;width:38px;height:38px;border-radius:11px;background:#f4ecff;font-size:22px}
-.home-family .profile b{grid-column:2;grid-row:1;font-size:12px;color:#2e2742}
-.home-family .profile .muted{grid-column:2;grid-row:2;font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.home-roster-meta{padding-top:11px;display:flex;justify-content:space-between;align-items:center;gap:8px}
-.home-roster-meta .muted{font-size:10px}
-.home-access{display:grid;grid-template-columns:43px 1fr auto;gap:10px;align-items:center;padding:12px 14px;background:linear-gradient(105deg,#fffdfd,#f3effc)}
-.home-access-icon{width:42px;height:42px;background:#ece5f9;border-radius:13px;display:grid;place-items:center;font-size:23px}
-.home-access h3{font-size:14px;margin:0 0 2px}
-.home-access p{font-size:11px;line-height:1.25;margin:0}
-.home-access button{white-space:nowrap;font-size:11px}
-.home-message{display:flex;gap:10px;align-items:center;padding:11px 14px;min-height:63px}
-.home-message .message-icon{font-size:22px}
-.home-message b{display:block;font-size:12px}
-.home-message p{margin:3px 0 0;font-size:11px;color:var(--sub);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:30ch}
-.extra-shortcuts{display:flex;gap:6px;margin-top:2px}
-.extra-shortcuts button{font-size:11px;color:#665483;padding:4px 8px;background:transparent;border:1px solid #dcd1e9;border-radius:9px}
-/* Live Chores: 4 profile tiles, readable on a landscape tablet. */
-.chores-hero{padding:17px 21px;margin-bottom:12px;background:linear-gradient(115deg,#fff,#f0e9fc);border-color:#e8dcfa}
-.chores-hero .spread{align-items:flex-start}
-.chores-hero h2{font-size:26px;margin:0 0 5px}
-.chores-hero p{margin:0;font-size:12px}
-.chores-hero .pill{font-size:11px;font-weight:750}
-.chores-family{padding:18px 20px}
-.chores-family .profiles{gap:13px;grid-template-columns:repeat(4,minmax(0,1fr))}
-.chores-family .profile{display:grid;place-items:center;align-content:center;gap:4px;min-height:146px;border:1px solid #e8dff5;background:linear-gradient(145deg,#fcfaff,#f7f3ff);border-radius:17px;padding:14px 10px}
-.chores-family .profile .icon{font-size:34px;line-height:1;display:grid;place-items:center;width:57px;height:57px;background:white;border-radius:18px;margin-bottom:5px}
-.chores-family .profile b{font-size:14px;max-width:100%}
-.chores-family .profile .muted{font-size:11px}
-.chores-info{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
-.chores-info .card{margin:0}
-.chores-info .note{font-size:12px}
-.access-heading{margin:0 0 12px;font-size:25px}
-.access-lead{font-size:13px;max-width:760px}
-.access-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.access-steps>.card{border:1px solid #ebe3f5;background:#fff;margin:0}
-.access-steps .step-num{width:31px;height:31px;border-radius:10px;background:#ede5fd;color:#664d99;display:grid;place-items:center;font-weight:850;margin-bottom:10px}
-.access-steps h3{font-size:16px;margin:0 0 8px}
-.access-steps p{font-size:12px;color:var(--sub)}
-.access-steps code{font-weight:800;font-size:14px;word-break:break-word}
-.access-steps .secondaryline{border:1px solid #e5dced;padding:12px 8px}
-.access-warning{margin-top:12px}
-/* Existing sub-apps retain all their behavior; give them the full width. */
-#app>.card{max-width:100%}
-#app>.card .profiles{gap:12px}
-#app>.card .profile{min-height:75px;padding:10px}
-@media(max-width:780px){
- .shell{padding:10px 11px 15px}.bar{height:auto;min-height:43px}.brand{font-size:18px}
- .home-landscape{grid-template-columns:1fr}.home-col{gap:10px}
- .home-hero{min-height:153px;padding:17px 19px}.home-hero h1{font-size:51px}
- .home-family{min-height:0}.home-apps button{min-height:76px}
- .access-steps{grid-template-columns:1fr}.chores-family .profiles{grid-template-columns:repeat(2,minmax(0,1fr))}
- .chores-info{grid-template-columns:1fr}
-}
-@media(max-width:420px){
- .bar .brand .muted{display:none}.home-family .profile{padding:7px 6px;grid-template-columns:35px minmax(0,1fr)}
- .home-family .profile .icon{width:32px;height:32px}.home-apps button{font-size:11px}
- .home-access{grid-template-columns:35px 1fr}.home-access-icon{width:35px;height:35px}
- .home-access button{grid-column:1/-1}.chores-family .profile{min-height:115px}
-}
-
-</style></head>
-<body><main class="shell"><div class="bar"><span class="brand">✿ KinKeep <span class="muted">Family Tablet · Landscape</span></span><span id="sltBar" class="muted">SLT</span></div><div id="app"><section class="card"><h2>✿ Loading KinKeep…</h2><p class="muted">Connecting your household display.</p></section></div><footer>KinKeep v1.6 · Landscape Edition · Live family roster · Parent verification through Firestorm</footer></main>
+</style>
+</head>
+<body><main>
+<div class="brand">✿ KinKeep · PRIVATE FAMILY VIEW</div>
+<h1>My Chores 🧹</h1>
+<p id="status" class="notice" role="status" aria-live="polite">Checking your one-time private link…</p>
+<section id="content" hidden>
+  <div id="member" class="member"></div>
+  <h2>Your assigned chores</h2>
+  <div id="list"></div>
+  <p class="notice">Chores you finish can be submitted to your Parent for approval. Reward points count only after approval. The private page is valid for up to 10 minutes; request a new link if it expires.</p>
+</section>
+<footer>KinKeep v1.9 · Private view · Never share your login link</footer>
+</main>
 <script>
 'use strict';
-const STORE='kinkeep-v05-demo',OLD='kinkeep-v04-demo';
-const ROLE=['Parent','Adult','Caregiver / Nanny','Youth','Teen','Custom'];
-const GRANTS=['assign','approve','bonus','routines','goals','notes','members','settings'];
-const GRANT_LABELS={assign:'Assign chores',approve:'Approve chores / request redo',bonus:'Award bonus points',routines:'Create or change routines',goals:'Set daily goal requirements',notes:'Moderate notes',members:'Manage family & permissions',settings:'Change household settings'};
-const EMOJIS=['🦋','🐼','🌸','🦊','🐸','🐻','🌻','🍓','🐱','🐢','🍄','🐝','🪷','🐧','⭐','🐰','🌷','🦄','🍒','🌵','🚀','🎮','🐙','🪴','🌙','🐳'];
-const IDEAS=['📚 Read for 20 minutes','🌳 Spend time outdoors','🎨 Create something','💪 Move your body','🧘 Take a mindfulness break','✍️ Write in a journal','🧩 Learn something new','🎵 Practice a skill'];
-const THEMES={'Cozy Bloom':['#8165b8','linear-gradient(135deg,#fbe5f1,#e5ddff)'],'Midnight Slate':['#375479','linear-gradient(135deg,#1e2c42,#61738b)'],'Warm Neutral':['#96724a','linear-gradient(135deg,#e7d7bf,#f8f3e9)'],'Ocean':['#20799a','linear-gradient(135deg,#c5ebee,#d5e1fb)'],'Forest':['#437b65','linear-gradient(135deg,#c8e2d1,#e8efc8)'],'Sunset':['#ab6168','linear-gradient(135deg,#fbd9d4,#f9e1af)']};
-const seed={family:'Our Household',theme:'Cozy Bloom',accent:'#8165b8',customUrl:'',wallpaperUUID:'',pinSalt:'',pinHash:'',members:[{id:'m1',name:'Mom',role:'Parent',emoji:'🦋',uuid:'',permissions:[]},{id:'m2',name:'Dad',role:'Parent',emoji:'🐼',uuid:'',permissions:[]},{id:'m3',name:'Youth',role:'Youth',emoji:'🌸',uuid:'',permissions:[]},{id:'m4',name:'Teen',role:'Teen',emoji:'🦊',uuid:'',permissions:[]}],chores:[{id:'c1',member:'m3',name:'Tidy your room',points:10,details:'Put away toys and clothes',due:'Today',status:'todo'},{id:'c2',member:'m4',name:'Wash dishes',points:15,details:'Wash and put away dishes',due:'Tonight',status:'todo'}],notes:[{id:'n1',author:'KinKeep',to:'Everyone',text:'Small chores, big teamwork! 🌷'}],goalRequirements:{m4:2},goals:[],routines:[]};
-const clone=x=>JSON.parse(JSON.stringify(x));
-let db;try{let fresh=localStorage.getItem(STORE),old=localStorage.getItem(OLD);db=fresh?JSON.parse(fresh):old?Object.assign(clone(seed),JSON.parse(old)):clone(seed)}catch(e){db=clone(seed)}
-for(const k of Object.keys(seed)){if(db[k]===undefined)db[k]=clone(seed[k])}
-if(!Array.isArray(db.members))db.members=clone(seed.members);
-for(const m of db.members){m.permissions=Array.isArray(m.permissions)?m.permissions:[];if(!ROLE.includes(m.role))m.role='Custom'}
-let page='home',personId=null,activeId=db.members[0]?.id||'',rosterPage=0,message='',unlockUntil=0,attempts=0,triesAt=0;
-// Phase 2 v0.9: public-on-screen READ-ONLY roster snapshot from LSL.
-// This URL fragment must never contain credentials, UUIDs, PINs or private chores.
-// It is for display ONLY; it cannot grant roles or Parent permissions.
-// Read the public, read-only roster snapshot from the MOAP URL fragment.
-// Device secrets are NEVER put in this URL and cannot grant Parent access.
-function parseRosterFragment(fragment) {
-  try {
-    if (!fragment.startsWith('#kkroster=')) return null;
-    const encoded=fragment.slice('#kkroster='.length);
-    const bytes=Uint8Array.from(atob(encoded),c=>c.charCodeAt(0));
-    const source=JSON.parse(new TextDecoder().decode(bytes));
-    if(source.ok===true && Array.isArray(source.members) && source.members.length<=4 &&
-       Number.isInteger(source.total) && source.total>=0 && Number.isInteger(source.page) &&
-       source.page>=1 && source.page<=50 && Number.isInteger(source.returned) &&
-       source.returned===source.members.length) {
-      return {page:source.page,total:source.total,members:source.members.map(m=>({
-        name:String(m.display_name||'Family member').slice(0,80),
-        role:String(m.role||'Member').slice(0,32),
-        emoji:String(m.profile_emoji||'⭐').slice(0,16)
-      }))};
+const endpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-my-chores';
+const status=document.getElementById('status');
+const content=document.getElementById('content');
+const list=document.getElementById('list');
+const member=document.getElementById('member');
+const match=location.hash.match(/^#ticket=([a-fA-F0-9]{32})$/);
+const ticket=match?match[1].toLowerCase():null;
+try {history.replaceState(null,'',location.pathname);} catch(e) { /* fragment is never sent as HTTP referrer */ }
+const labels={todo:'To do',started:'In progress',submitted:'Awaiting Parent',redo:'Needs redo',approved:'Approved'};
+let submitToken=null;
+let expiresAt=0;
+const uuidPattern=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+async function markComplete(chore, button, noteBox, result, card, pill){
+ if(!submitToken||Date.now()>expiresAt){
+   result.textContent='Your private session expired. Type /984625 chores in Second Life to open a new link.';return;
+ }
+ if(!uuidPattern.test(String(chore.id||''))){result.textContent='This chore has no valid identifier. Ask your Parent for help.';return;}
+ const note=noteBox.value.trim();
+ if(note.length>300){result.textContent='Please shorten your note to 300 characters.';return;}
+ if(!confirm('Submit "'+String(chore.title||'this chore').slice(0,80)+'" to your Parent for approval?'))return;
+ button.disabled=true;result.textContent='Submitting your chore securely…';
+ try{
+   const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},
+     body:JSON.stringify({action:'submit',submit_token:submitToken,chore_id:chore.id,completion_note:note})});
+   const body=await response.json();
+   if(!response.ok||body.ok!==true)throw Error(body.error||'Could not submit your chore');
+   chore.status='submitted';
+   pill.className='pill submitted';pill.textContent='Awaiting Parent';
+   const area=button.closest('.submitArea');
+   if(area){area.replaceChildren(el('div','notice','Submitted! Your Parent can now approve it or request a redo. ⭐'));}
+ }catch(e){
+   result.textContent=(e instanceof Error?e.message:'Unable to submit')+' If the connection failed, reopen your chores to check the status before trying again.';
+   button.disabled=false;
+ }
+}
+
+function el(tag,cls,text) {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;}
+function fmtDate(d){if(!d)return'No due date';const parsed=new Date(d);if(!Number.isFinite(parsed.getTime()))return'No due date';return new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',month:'short',day:'numeric',year:'numeric'}).format(parsed)+' SLT';}
+async function load(){
+ if(!ticket){status.textContent='To see your chores, stand near your Second Life tablet and type /984625 chores as a registered Youth or Teen.';return;}
+ try{
+  const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({action:'redeem',ticket})});
+  const body=await response.json();
+  if(!response.ok||body.ok!==true)throw Error(body.error||'Could not load your chores');
+  submitToken=typeof body.submit_token==='string'?body.submit_token:null;
+  expiresAt=Date.now()+Math.max(0,Math.min(Number(body.session_seconds)||0,600))*1000;
+  if(!submitToken||!(/^[a-f0-9]{64}$/).test(submitToken))throw Error('Secure submission session was not created');
+  const m=body.member||{};
+  const icon=el('span','emoji',String(m.profile_emoji||'⭐').slice(0,16));
+  const detail=el('div');detail.append(el('b','',m.display_name||'Family member'),el('small','',m.role||'Youth'));
+  member.append(icon,detail);
+  const chores=Array.isArray(body.chores)?body.chores:[];
+  if(!chores.length){list.append(el('div','empty','No chores assigned yet. Enjoy your free time! 🌈'));}
+  else for(const chore of chores){
+    const card=el('article','chore');const head=el('div','chorehead');
+    const h=el('h3','',chore.title||'Untitled chore');
+    const badge=el('span','pill '+String(chore.status||'').replace(/[^a-z]/g,''),labels[chore.status]||'Assigned');
+    head.append(h,badge);card.append(head);
+    if(chore.instructions)card.append(el('p','instruction',chore.instructions));
+    card.append(el('div','meta',String(chore.points??0)+' ⭐ points · '+fmtDate(chore.due_at)));
+    if(chore.review_note)card.append(el('p','notice','Parent note: '+chore.review_note));
+    if(chore.submission_note)card.append(el('p','notice','Your completion note: '+chore.submission_note));
+    if(['todo','started','redo'].includes(String(chore.status))){
+      const area=el('div','submitArea');
+      const label=el('label','', 'Optional note to your Parent (up to 300 characters)');
+      const noteBox=el('textarea');noteBox.maxLength=300;noteBox.placeholder='All done, Mom!';
+      const button=el('button','','Mark Complete · Ask Parent to Approve');button.type='button';
+      const result=el('div','result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
+      button.addEventListener('click',()=>{void markComplete(chore,button,noteBox,result,card,badge);});
+      area.append(label,noteBox,button,result);card.append(area);
     }
-  } catch (_err) { /* Keep demo UI if payload is invalid. */ }
-  return null;
+    list.append(card);
+  }
+  status.textContent='Your private chore list is ready. Only this registered avatar’s chores were retrieved.';
+  content.hidden=false;
+ }catch(e){status.textContent=(e instanceof Error?e.message:'Could not load your chores')+' — Request a new private link from Second Life.';}
 }
-let lastRosterFragment=window.location.hash;
-let liveRoster=parseRosterFragment(lastRosterFragment);
-// MOAP may navigate to a new #fragment without refreshing the entire webpage.
-// Handle both normal browser hash events and Firestorm viewers that miss the event.
-function syncRosterFromScreenUrl() {
-  const fragment=window.location.hash;
-  if (fragment===lastRosterFragment) return;
-  lastRosterFragment=fragment;
-  liveRoster=parseRosterFragment(fragment);
-  render();
-}
-function liveRosterTiles() {
-  if(!liveRoster) return '';
-  const tiles=liveRoster.members.map(m=>`<div class="profile" aria-label="Live family member"><span class="icon">${esc(m.emoji)}</span><b>${esc(m.name)}</b><span class="muted">${esc(m.role)}</span></div>`).join('');
-  const blanks=Array.from({length:4-liveRoster.members.length},()=>`<div class="profile" style="border-style:dashed;opacity:.65" aria-label="Empty family slot"><span class="icon">＋</span><b>Empty slot</b><span class="muted">—</span></div>`).join('');
-  return tiles+blanks;
-}
-
-const el=id=>document.getElementById(id), esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),id=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
-const actor=()=>db.members.find(m=>m.id===activeId),byId=i=>db.members.find(m=>m.id===i),isParent=()=>actor()?.role==='Parent',isUnlocked=()=>isParent()&&Date.now()<unlockUntil;
-function may(action){const a=actor();if(!a)return false;if(a.role==='Parent')return isUnlocked();return a.permissions.includes(action)&&!['members','settings'].includes(action)}
-function store(){try{localStorage.setItem(STORE,JSON.stringify(db));return true}catch(e){message='Browser storage unavailable. Changes may not persist.';return false}}
-function pageTo(p,target){page=p;personId=target||null;rosterPage=0;render()}
-function announce(t){message=t;render()}
-function controls(label,p,target){return `<button class="secondary mini" data-page="${p}" ${target?`data-target="${esc(target)}"`:''}>${label}</button>`}
-function dateTime(){const d=new Date(),options={timeZone:'America/Los_Angeles'};const clock=new Intl.DateTimeFormat('en-US',{...options,hour:'numeric',minute:'2-digit'}).format(d);const date=new Intl.DateTimeFormat('en-US',{...options,weekday:'long',month:'short',day:'numeric'}).format(d);const day=new Intl.DateTimeFormat('en-CA',{...options,year:'numeric',month:'2-digit',day:'2-digit'}).format(d);return {clock,date,day}}
-function styleTheme(){let bg=(THEMES[db.theme]||THEMES['Cozy Bloom'])[1],accent=db.accent||'#8165b8';if(db.theme==='Custom URL'&&/^https:\/\//i.test(db.customUrl))bg=`url("${db.customUrl.replace(/["\\\n\r]/g,'')}")`;document.documentElement.style.setProperty('--accent',accent);document.documentElement.style.setProperty('--wall',bg)}
-function roleName(m){return m.role==='Custom'&&m.customRole?m.customRole:m.role}
-function prof(m){return `<button class="profile" data-page="person" data-target="${esc(m.id)}"><span class="icon">${esc(m.emoji)}</span><b>${esc(m.name)}</b><span class="muted">${esc(roleName(m))}</span></button>`}
-function actorWidget(){return `<div class="intro"><label class="field">👤 Preview as (NOT avatar authentication)<select id="actor">${db.members.map(m=>`<option value="${esc(m.id)}" ${activeId===m.id?'selected':''}>${esc(m.emoji)} ${esc(m.name)} · ${esc(roleName(m))}</option>`).join('')}</select></label><p class="muted">Switching identities is just for testing. Real identity checks require LSL and a secure server.</p></div>`}
-function home(){
-  const t=dateTime();
-  const apps=[['🧹','Chores','chores'],['📝','Notes','notes'],['⭐','Daily Goals','goals'],['🏡','Family','family'],['⏰','Routines','routines'],['🎨','Settings','settings']];
-  return `<div class="home-landscape">
-    <div class="home-col">
-      <section class="card home-hero">
-        <div class="home-eyebrow">✦ Welcome home <span>·</span> ${esc(db.family)}</div>
-        <h1 id="clock">${t.clock}</h1>
-        <div id="date">${t.date} · Second Life Time</div>
-        <div class="weather-demo">☁️ Weather preview · Demo only</div>
-      </section>
-      <section class="card home-app-panel">
-        <h3>Explore KinKeep <span class="muted">· Your family hub</span></h3>
-        <div class="home-apps">${apps.map(a=>`<button data-page="${a[2]}"><span class="icon">${a[0]}</span>${a[1]}</button>`).join('')}</div>
-      </section>
-    </div>
-    <div class="home-col">
-      <section class="card home-family">
-        <div class="spread"><h3>Our little family 🌿</h3>${liveRoster?controls('View chores →','chores'):controls('View family →','family')}</div>
-        <div class="profiles">${liveRoster?liveRosterTiles():`<div class="profile" style="grid-column:1/-1;display:block;min-height:135px;padding:22px;text-align:center"><b style="white-space:normal">Live household not loaded</b><span class="muted">Use the in-world roster sync to display your family.</span></div>`}</div>
-        <div class="home-roster-meta"><span class="muted">${liveRoster?`● Live from Supabase · Page ${liveRoster.page} · ${liveRoster.total} active`:'Waiting for secure tablet roster'}</span><span class="pill">4 slots</span></div>
-      </section>
-      <section class="card home-access">
-        <div class="home-access-icon">🔐</div>
-        <div><h3>Parent Access</h3><p class="muted">Protected household settings and family management</p></div>
-        ${controls('Open →','access')}
-      </section>
-      <section class="card home-message">
-        <span class="message-icon">💌</span>
-        <div><b>Little family reminder</b><p>${esc(db.notes.at(-1)?.text||'Small chores, big teamwork! 🌷')} <span class="muted">· Demo note</span></p></div>
-      </section>
-      <div class="extra-shortcuts">${controls('📅 Calendar','calendar')}${controls('🖼️ Photos','photos')}</div>
-    </div>
-  </div>`;
-}
-
-function family(){return (liveRoster?`<section class="card note">This Family editor is a local <b>demo</b>. Adding people here will not change your Supabase household. Live family names are on the Chores page.</section>`:``)+`<section class="card"><h2>🏡 ${esc(db.family)}</h2><p class="muted">${db.members.length} member(s). Four appear at once on the home screen.</p><div class="profiles">${db.members.map(prof).join('')}</div></section>${may('members')?`<section class="card"><h3>➕ Add family member</h3><form id="newMember" class="stack"><label class="field">Display name<input name="name" required maxlength="45"></label><label class="field">Household role<select name="role">${ROLE.map(r=>`<option>${esc(r)}</option>`).join('')}</select></label><label class="field">Custom relationship label (optional, e.g., Aunt, Grandparent)<input name="customRole" maxlength="40" placeholder="Only used when role is Custom"></label><label class="field">Second Life avatar UUID (optional demo)<input name="uuid" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"></label><label class="field">Profile emoji<select name="emoji">${EMOJIS.map(e=>`<option>${e}</option>`).join('')}</select></label><button>Add member</button></form></section><section class="card"><h3>🛡️ Manage permissions</h3><p class="muted">An adult or caregiver is NOT automatically a parent. Grant only the actions they need.</p>${db.members.map(m=>`<div class="spread subtle" style="margin-bottom:7px"><div>${esc(m.emoji)} <b>${esc(m.name)}</b> <span class="pill">${esc(roleName(m))}</span></div>${controls('Edit →','memberedit',m.id)}</div>`).join('')}</section>`:`<section class="card note">Only a parent who has unlocked Parent Access can add members or change permissions. Other adults do not receive automatic admin access. ${controls('Parent Access','access')}</section>`}`}
-function editMember(uid){if(!may('members'))return lockPage('Manage members');let m=byId(uid);if(!m)return `<section class="card">Member not found.</section>`;return `<section class="card"><h2>🛡️ ${esc(m.name)}</h2><form id="editMember" data-member="${esc(uid)}" class="stack"><label class="field">Display name<input name="name" maxlength="45" required value="${esc(m.name)}"></label><label class="field">Role<select name="role">${ROLE.map(r=>`<option ${m.role===r?'selected':''}>${esc(r)}</option>`).join('')}</select></label><label class="field">Custom relationship label<input name="customRole" maxlength="40" value="${esc(m.customRole||'')}" placeholder="Aunt, Grandparent, etc."></label><label class="field">Profile emoji<select name="emoji">${EMOJIS.map(e=>`<option ${m.emoji===e?'selected':''}>${e}</option>`).join('')}</select></label><label class="field">Second Life UUID (display metadata only)<input name="uuid" value="${esc(m.uuid)}"></label><h3>Extra permissions</h3><p class="muted">Non-parent roles begin with no elevated permissions. Only actual approved roles and server verification will make these secure in the finished system.</p>${GRANTS.filter(x=>!['members','settings'].includes(x)).map(k=>`<label class="check"><input type="checkbox" name="grant" value="${k}" ${m.permissions.includes(k)?'checked':''}> ${GRANT_LABELS[k]}</label>`).join('')}<button>Save member & permissions</button></form></section>`}
-function pinPage(){return `<section class="card"><h2 class="access-heading">🔐 Secure Parent Access</h2><p class="muted access-lead">Parents sign in through a private browser opened by Firestorm. Your four-digit PIN is never entered on this shared tablet screen.</p></section>
-  <div class="access-steps">
-    <section class="card"><div class="step-num">1</div><h3>Sign in privately</h3><p>In Firestorm Nearby Chat, enter:</p><div class="secondaryline"><code>/984622 unlock</code></div><p>Open the private browser dialog and enter your existing four-digit PIN there.</p></section>
-    <section class="card"><div class="step-num">2</div><h3>Open Parent controls</h3><p>After the browser confirms your verified login, enter:</p><div class="secondaryline"><code>/984623 parent</code></div><p>The server checks your active Parent session before showing the private menu.</p></section>
-    <section class="card"><div class="step-num">3</div><h3>Lock when finished</h3><p>Click <b>Lock</b> in the private Parent menu, or enter:</p><div class="secondaryline"><code>/984623 lock</code></div><p>Access lasts up to ten minutes, or until you lock it.</p></section>
-  </div><p class="note access-warning">Protected Parent changes use your authenticated Supabase session. The shared tablet displays guidance only; it does not unlock the website's old demo management features.</p>`}
-
-function lockPage(reason){return `<section class="card"><h2>🔐 ${reason}</h2><p>Authorized access is needed for this action.</p>${controls('Open Parent Access','access')} ${controls('Home','home')}</section>`}
-function admin(){if(!may('members'))return lockPage('Parent Dashboard');return `<section class="card"><h2>👑 Parent Dashboard</h2><p>Major settings are temporarily unlocked in this demo.</p><div class="action-list">${[['👥 Manage household','family'],['🧹 Assign chores','assign'],['✅ Review submissions','review'],['⭐ Daily goal requirements','goaladmin'],['⏰ Schedule reminders','routinemanage'],['🎨 Customize tablet','settings']].map(([t,p])=>`<div>${controls(t,p)}</div>`).join('')}</div></section>`}
-function chores(){
-  if(liveRoster)return `<section class="card chores-hero"><div class="spread"><div><h2>🧹 Family Chores</h2><p class="muted">Your household, all in one place · Live family roster</p></div><span class="pill">● Connected to Supabase</span></div></section>
-    <section class="card chores-family"><h3>Family profiles <span class="muted">· Page ${liveRoster.page}</span></h3><div class="profiles">${liveRosterTiles()}</div></section>
-    <div class="chores-info"><section class="card"><h3>🌿 Household overview</h3><p class="muted">${liveRoster.total} active family member(s) · Currently showing ${liveRoster.members.length}.</p><p class="small">For more family pages, the tablet owner can use <code>/984619 show 2</code> in Firestorm Nearby Chat.</p></section>
-    <section class="card"><h3>🔐 Parent Management</h3><p class="muted">This family roster is live and read-only. Chore assignments and approvals are still in development.</p>${controls('Secure Parent Access →','access')}</section></div>`;
-  return `<section class="card chores-hero"><h2>🧹 Family Chores</h2><p class="muted">Waiting for live household data from your paired tablet.</p></section><section class="card"><p>This screen has not received a live Supabase family roster yet.</p><p class="muted">On your Second Life tablet, use <code>/984619 show</code> to load the household roster.</p></section>`;
-}
-
-function choreMember(uid){let m=byId(uid);if(!m)return `<div class="card">Member missing.</div>`;const list=db.chores.filter(c=>c.member===uid);return `<section class="card"><div class="spread"><h2>${esc(m.emoji)} ${esc(m.name)}</h2><span class="pill">${esc(m.role)}</span></div><p class="muted">${list.filter(c=>c.status==='approved').length}/${list.length} approved · ${list.filter(c=>c.status==='approved').reduce((s,c)=>s+Number(c.points||0),0)} points</p>${activeId===uid?`<label class="field">My profile emoji<select id="selfEmoji" data-target="${esc(uid)}">${EMOJIS.map(e=>`<option ${e===m.emoji?'selected':''}>${e}</option>`).join('')}</select></label>`:''}</section>${list.length?list.map(c=>`<section class="card"><div class="spread"><h3>${esc(c.name)}</h3><span class="pill">${esc(c.status)}</span></div><p>${esc(c.details)}</p><p class="muted">Due ${esc(c.due)} · ${Number(c.points)||0} points</p><div class="row">${activeId===uid&&['todo','redo'].includes(c.status)?`<button class="mini" data-action="choreStart" data-id="${esc(c.id)}">Start</button>`:''}${activeId===uid&&c.status==='started'?`<button class="mini" data-action="choreSubmit" data-id="${esc(c.id)}">Submit</button>`:''}${may('approve')&&c.status==='pending'?`<button class="mini" data-action="choreApprove" data-id="${esc(c.id)}">Approve</button><button class="mini secondary" data-action="choreRedo" data-id="${esc(c.id)}">Redo</button>`:''}</div></section>`).join(''):`<section class="card">No chores assigned yet.</section>`}${may('assign')?`<section class="card">${controls('＋ Assign a chore','assign',uid)}</section>`:''}`}
-function assign(){if(!may('assign'))return lockPage('Assign chores');return `<section class="card"><h2>＋ Assign chores</h2><p>Each selected family member receives a separate assignment and status.</p><form id="assign" class="stack"><label class="field">Chore<input name="name" maxlength="100" required></label><label class="field">Instructions<textarea name="details"></textarea></label><label class="field">Due<input name="due" value="Today"></label><label class="field">Points per member<input name="points" type="number" min="0" max="9999" value="10"></label><b>Assign to</b>${db.members.map(m=>`<label class="check"><input type="checkbox" name="who" value="${esc(m.id)}" ${personId===m.id?'checked':''}>${esc(m.emoji)} ${esc(m.name)} · ${esc(roleName(m))}</label>`).join('')}<button>Assign selected members</button></form></section>`}
-function review(){if(!may('approve'))return lockPage('Review chores');let cs=db.chores.filter(c=>c.status==='pending');return `<section class="card"><h2>✅ Review submissions</h2><p class="muted">${cs.length} chore(s) waiting</p></section>${cs.map(c=>`<section class="card"><h3>${esc(c.name)} — ${esc(byId(c.member)?.name||'Unknown')}</h3><p>${esc(c.details)}</p><div class="row"><button class="mini" data-action="choreApprove" data-id="${esc(c.id)}">Approve</button><button class="mini secondary" data-action="choreRedo" data-id="${esc(c.id)}">Request redo</button></div></section>`).join('')}`}
-function goals(){let today=dateTime().day,m=actor(),mine=db.goals.filter(g=>g.member===activeId&&g.day===today),required=Math.max(0,Number(db.goalRequirements[activeId]||0)),done=mine.filter(g=>g.status==='approved').length;return `<section class="card"><h2>⭐ Daily Goals</h2><p>Pick something positive to work on each day.</p><div class="subtle">${esc(m?.emoji||'⭐')} ${esc(m?.name||'Member')} · ${mine.length} chosen today · ${done} approved · ${required} required</div>${(m?.role==='Teen'||m?.role==='Youth')?`<p class="muted">Choose your own goals. A parent can set your daily goal requirement.</p>`:''}</section><section class="card"><h3>Today's goals</h3>${mine.length?mine.map(g=>`<div class="subtle" style="margin:7px 0"><div class="spread"><b>${esc(g.name)}</b><span class="pill">${esc(g.status)}</span></div><div class="row" style="margin-top:7px">${['selected','redo'].includes(g.status)?`<button class="mini" data-action="goalSubmit" data-id="${esc(g.id)}">Submit completed</button>`:''}${g.status==='pending'&&may('approve')?`<button class="mini" data-action="goalApprove" data-id="${esc(g.id)}">Approve</button><button class="mini secondary" data-action="goalRedo" data-id="${esc(g.id)}">Redo</button>`:''}</div></div>`).join(''):'<p class="muted">No goals chosen today.</p>'}</section><section class="card"><h3>Choose a goal</h3><div class="row">${IDEAS.map((idea,n)=>`<button class="mini secondary" data-action="chooseIdea" data-index="${n}">${esc(idea)}</button>`).join('')}</div><form id="customGoal" class="stack" style="margin-top:12px"><label class="field">Or write your own goal<input name="name" maxlength="90" required placeholder="e.g., Read a chapter"></label><button>Add my goal</button></form></section>${may('goals')?`<section class="card">${controls('Set goal requirements','goaladmin')}</section>`:''}<p class="muted">Demo goal completion is not verified by SL or a parent backend.</p>`}
-function goalAdmin(){if(!may('goals'))return lockPage('Goal requirements');return `<section class="card"><h2>⭐ Daily Goal Requirements</h2><p>Set how many goals each youth or teen should choose daily. These are per-person targets.</p><form id="goalRules" class="stack">${db.members.filter(m=>['Youth','Teen'].includes(m.role)).map(m=>`<label class="field">${esc(m.emoji)} ${esc(m.name)} (${m.role})<input type="number" min="0" max="12" name="require-${esc(m.id)}" value="${Number(db.goalRequirements[m.id]||0)}"></label>`).join('')}<button>Save requirements</button></form></section>`}
-function routineList(){let sorted=db.routines.slice().sort((a,b)=>a.time.localeCompare(b.time));return `<section class="card"><h2>⏰ Family Routines</h2><p>Parent-configured reminders use <b>Second Life Time (Pacific)</b>. Each member can have a different schedule.</p><p class="note">These are saved schedule previews only. The current webpage does <b>not</b> send timed in-world chat; that needs an LSL reminder script and reliable shared configuration.</p>${sorted.length?sorted.map(r=>`<div class="subtle" style="margin:9px 0"><div class="spread"><b>${esc(r.time)} · ${esc(r.label)}</b><span class="pill">${r.enabled?'Scheduled preview':'Disabled'}</span></div><div class="muted">${esc(byId(r.member)?.name||'Unknown')} · ${esc(r.days)}</div>${may('routines')?`<button class="mini secondary" data-action="deleteRoutine" data-id="${esc(r.id)}" style="margin-top:7px">Remove schedule</button>`:''}</div>`).join(''):'<p>No routines have been added yet.</p>'}</section>${may('routines')?`<section class="card">${controls('Add a routine','routinemanage')}</section>`:''}`}
-function routineManage(){if(!may('routines'))return lockPage('Routine scheduler');return `<section class="card"><h2>⏰ Add a routine</h2><p>Configure individual homework, hygiene, and bedtime reminders.</p><form id="addRoutine" class="stack"><label class="field">For member<select name="member">${db.members.map(m=>`<option value="${esc(m.id)}">${esc(m.name)} · ${esc(roleName(m))}</option>`).join('')}</select></label><label class="field">Routine<select name="label"><option>📚 Homework</option><option>🪥 Brush teeth</option><option>🛁 Bath or shower</option><option>🌙 Bedtime</option><option>⭐ Daily goals</option><option>🧹 Chores</option></select></label><label class="field">Reminder time (SLT)<input type="time" name="time" required value="20:00"></label><label class="field">Days<select name="days"><option>Every day</option><option>Weekdays</option><option>Weekends</option></select></label><button>Add reminder schedule</button></form></section>${routineList()}`}
-function notes(){return `<section class="card"><h2>📝 Family Notes</h2><p class="muted">All notes here are visible to anyone using this demo; “To” is a label, not private messaging.</p><form id="noteForm" class="stack"><label class="field">From<input readonly value="${esc(actor()?.name||'Guest')}"></label><label class="field">To<select name="to"><option>Everyone</option>${db.members.map(m=>`<option>${esc(m.name)}</option>`).join('')}</select></label><label class="field">Message<textarea name="text" maxlength="600" required placeholder="Leave a kind note or reminder"></textarea></label><button>Post note</button></form></section>${db.notes.slice().reverse().map(n=>`<section class="card"><div class="spread"><b>💌 ${esc(n.author)}</b><span class="pill">To: ${esc(n.to)}</span></div><p>${esc(n.text)}</p>${may('notes')||n.author===actor()?.name?`<button class="mini secondary" data-action="deleteNote" data-id="${esc(n.id)}">Delete note</button>`:''}</section>`).join('')}`}
-function settings(){return `<section class="card"><h2>🎨 Appearance Studio</h2><p>All homes can browse designs; only an unlocked demo Parent can save household settings.</p><div class="grid2">${Object.entries(THEMES).map(([name,[color,bg]])=>`<button class="wall" style="background:${bg}" data-theme="${esc(name)}" ${!may('settings')?'disabled':''}>${esc(name)}</button>`).join('')}</div>${may('settings')?`<form id="appearance" class="stack" style="margin-top:13px"><label class="field">Household name<input name="family" maxlength="60" value="${esc(db.family)}"></label><label class="field">Accent color<input type="color" name="accent" value="${esc(db.accent)}"></label><label class="field">Custom image HTTPS URL<input name="customUrl" type="url" value="${esc(db.customUrl)}" placeholder="https://example.com/wallpaper.jpg"></label><label class="field">SL texture UUID (stored for future LSL integration only)<input name="wallpaperUUID" value="${esc(db.wallpaperUUID)}"></label><button>Save appearance</button></form><button class="secondary mini" data-action="resetTheme" style="margin-top:10px">Restore Cozy Bloom</button>`:`<p class="note">Major settings are locked. ${isParent()?'Open Parent Access to unlock.':'Only authorized parents can change them.'}</p>${controls('Parent Access','access')}`}<p class="muted">An SL texture UUID does not display directly as an HTML wallpaper. HTTPS images may be blocked by their hosts.</p></section>`}
-function render(){styleTheme();let names={home:'Home',family:'Family',memberedit:'Member permissions',access:'Parent Access',admin:'Parent Dashboard',chores:'Chores',person:'Personal chores',assign:'Assign chores',review:'Review',goals:'Daily Goals',goaladmin:'Goal Requirements',routines:'Routines',routinemanage:'Schedule Reminder',notes:'Notes',settings:'Settings',calendar:'Calendar',photos:'Photos'};let view={home, family,memberedit:()=>editMember(personId),access:pinPage,admin,chores,person:()=>choreMember(personId),assign,review,goals,goaladmin:goalAdmin,routines:routineList,routinemanage:routineManage,notes,settings,calendar:()=>'<section class="card"><h2>📅 Calendar</h2><p>Coming later — future reminders and family events will live here.</p></section>',photos:()=>'<section class="card"><h2>🖼️ Photos</h2><p>Coming later — decorative app for now.</p></section>'}[page]||home;
-const top=page==='home'?'':`<nav class="nav">${controls('← Home','home')}<b>${names[page]||'KinKeep'}</b>${controls('Chores','chores')}</nav>`;
-el('app').innerHTML=top+(message?`<div class="note" style="margin:10px 0">${esc(message)}</div>`:'')+view();message='';updateClock()}
-function updateClock(){const t=dateTime();if(el('sltBar'))el('sltBar').textContent=t.clock+' SLT';if(el('clock'))el('clock').textContent=t.clock;if(el('date'))el('date').textContent=t.date+' · Second Life Time'}
-async function pinDigest(s){if(!globalThis.crypto?.subtle)throw Error('Secure hashing is unavailable in this browser. Open the page over HTTPS.');const b=new TextEncoder().encode(s);let result=await crypto.subtle.digest('SHA-256',b);return Array.from(new Uint8Array(result)).map(n=>n.toString(16).padStart(2,'0')).join('')}
-function requireGrant(grant){if(may(grant))return true;message='This profile is not authorized for that action.';render();return false}
-function handleClick(e){const b=e.target.closest('button');if(!b)return;if(b.dataset.page){pageTo(b.dataset.page,b.dataset.target);return}if(b.dataset.theme){if(!requireGrant('settings'))return;db.theme=b.dataset.theme;db.accent=THEMES[db.theme][0];store();render();return}
-const a=b.dataset.action,ref=b.dataset.id;if(a==='next'||a==='prev'){rosterPage+=a==='next'?1:-1;render();return}if(a==='lock'){unlockUntil=0;announce('Parent Access locked.');return}if(a==='resetTheme'){if(!requireGrant('settings'))return;db.theme='Cozy Bloom';db.accent=THEMES['Cozy Bloom'][0];db.customUrl='';store();render();return}
-if(a==='deleteRoutine'){if(!requireGrant('routines'))return;db.routines=db.routines.filter(r=>r.id!==ref);store();render();return}if(a==='deleteNote'){const note=db.notes.find(n=>n.id===ref);if(!note||!(may('notes')||note.author===actor()?.name))return;db.notes=db.notes.filter(n=>n.id!==ref);store();render();return}
-if(a==='chooseIdea'){addGoal(IDEAS[Number(b.dataset.index)]);return}
-let c=db.chores.find(c=>c.id===ref),g=db.goals.find(g=>g.id===ref);
-if(['choreStart','choreSubmit','choreApprove','choreRedo'].includes(a)&&c){if(a==='choreStart'||a==='choreSubmit'){if(c.member!==activeId)return;c.status=a==='choreStart'?'started':'pending'}else{if(!requireGrant('approve'))return;c.status=a==='choreApprove'?'approved':'redo'}store();render();return}
-if(['goalSubmit','goalApprove','goalRedo'].includes(a)&&g){if(a==='goalSubmit'){if(g.member!==activeId)return;g.status='pending'}else{if(!requireGrant('approve'))return;g.status=a==='goalApprove'?'approved':'redo'}store();render()}}
-function addGoal(name){let d=dateTime().day;if(!String(name||'').trim())return;db.goals.push({id:id(),member:activeId,day:d,name:String(name).slice(0,100),status:'selected'});store();render()}
-function uuidOk(v){return !v||/^[\da-f]{8}(-[\da-f]{4}){3}-[\da-f]{12}$/i.test(v)}
-async function handleSubmit(e){e.preventDefault();const f=e.target,fd=new FormData(f),val=k=>String(fd.get(k)||'').trim();let parentProfile=actor();
-if(f.id==='newMember'){if(!requireGrant('members'))return;let uuid=val('uuid');if(!uuidOk(uuid)){announce('Please enter a valid SL UUID or leave it blank.');return}db.members.push({id:id(),name:val('name'),role:val('role'),customRole:val('customRole'),emoji:val('emoji'),uuid,permissions:[]});store();announce('Member added. No extra permissions were granted.');return}
-if(f.id==='editMember'){if(!requireGrant('members'))return;let m=byId(f.dataset.member);if(!m)return;let uuid=val('uuid');if(!uuidOk(uuid)){announce('Invalid avatar UUID.');return}if(m.role==='Parent'&&val('role')!=='Parent'&&db.members.filter(x=>x.role==='Parent').length===1){announce('A household must keep at least one Parent.');return}m.name=val('name');m.role=val('role');m.customRole=val('customRole');m.emoji=val('emoji');m.uuid=uuid;m.permissions=fd.getAll('grant').filter(x=>GRANTS.includes(x));if(m.role==='Parent'){m.permissions=[]}store();announce('Member profile and demo permissions updated.');return}
-if(f.id==='assign'){if(!requireGrant('assign'))return;let ids=fd.getAll('who');if(!ids.length){announce('Select at least one recipient.');return}for(const who of ids){if(!byId(who))continue;db.chores.push({id:id(),member:who,name:val('name'),details:val('details'),due:val('due'),points:Math.min(9999,Math.max(0,Number(fd.get('points'))||0)),status:'todo'})}store();page='chores';announce('Assigned separate chores to '+ids.length+' member(s).');return}
-if(f.id==='customGoal'){addGoal(val('name'));return}
-if(f.id==='goalRules'){if(!requireGrant('goals'))return;for(const m of db.members.filter(x=>['Youth','Teen'].includes(x.role)))db.goalRequirements[m.id]=Math.max(0,Math.min(12,Number(fd.get('require-'+m.id))||0));store();announce('Daily goal requirements saved.');return}
-if(f.id==='addRoutine'){if(!requireGrant('routines'))return;db.routines.push({id:id(),member:val('member'),label:val('label'),time:val('time'),days:val('days'),enabled:true});store();page='routines';announce('Reminder schedule saved for the future LSL integration (not an active alarm).');return}
-if(f.id==='noteForm'){db.notes.push({id:id(),author:parentProfile?.name||'Guest',to:val('to'),text:val('text')});store();announce('Note posted in this browser.');return}
-if(f.id==='appearance'){if(!requireGrant('settings'))return;db.family=val('family')||'Our Household';db.accent=val('accent');db.customUrl=val('customUrl');db.wallpaperUUID=val('wallpaperUUID');if(db.customUrl)db.theme='Custom URL';store();announce('Appearance saved locally.');return}}
-document.addEventListener('click',handleClick);
-document.addEventListener('submit',e=>{handleSubmit(e).catch(err=>announce('An unexpected error occurred: '+err.message))});
-document.addEventListener('change',e=>{if(e.target.id==='actor'){activeId=e.target.value;unlockUntil=0;message='Switched demo profile; elevated access locked.';page='home';render()}if(e.target.id==='selfEmoji'){let m=byId(e.target.dataset.target);if(m&&m.id===activeId){m.emoji=e.target.value;store();render()}}});
-window.addEventListener('hashchange',syncRosterFromScreenUrl);
-setInterval(syncRosterFromScreenUrl,1000);
-render();setInterval(updateClock,30000);
-</script></body></html>
+load();
+</script>
+</body></html>
