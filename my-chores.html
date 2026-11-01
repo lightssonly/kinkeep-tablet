@@ -25,6 +25,13 @@ p{line-height:1.55;color:#665e76;font-size:13px}
 .meta{font-size:12px;color:#665d76;margin-top:9px} .instruction{white-space:pre-wrap;overflow-wrap:anywhere}
 .empty{padding:24px;text-align:center;border:1px dashed #d8c9e9;border-radius:14px;color:#64577c}
 footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
+.submitArea{margin-top:14px;border-top:1px solid #e4dcec;padding-top:12px}
+.submitArea label{display:block;font-weight:700;font-size:12px;margin:0 0 6px;color:#55496e}
+.submitArea textarea{width:100%;resize:vertical;border:1px solid #c9bcde;border-radius:9px;min-height:62px;padding:9px;font:inherit;font-size:13px}
+.submitArea button{margin-top:9px;border:0;border-radius:10px;background:#7251a5;color:white;padding:10px 16px;font-size:13px;font-weight:800;cursor:pointer}
+.submitArea button:disabled{opacity:.5;cursor:wait}
+.submitArea .result{font-size:12px;color:#4c4472;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
+
 </style>
 </head>
 <body><main>
@@ -35,9 +42,9 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
   <div id="member" class="member"></div>
   <h2>Your assigned chores</h2>
   <div id="list"></div>
-  <p class="notice">This is a read-only view. You'll be able to submit completed chores from here after we add secure Youth/Teen completion in the next update.</p>
+  <p class="notice">Chores you finish can be submitted to your Parent for approval. Reward points count only after approval. The private page is valid for up to 10 minutes; request a new link if it expires.</p>
 </section>
-<footer>KinKeep v1.8 · Private view · Never share your login link</footer>
+<footer>KinKeep v1.9 · Private view · Never share your login link</footer>
 </main>
 <script>
 'use strict';
@@ -50,6 +57,33 @@ const match=location.hash.match(/^#ticket=([a-fA-F0-9]{32})$/);
 const ticket=match?match[1].toLowerCase():null;
 try {history.replaceState(null,'',location.pathname);} catch(e) { /* fragment is never sent as HTTP referrer */ }
 const labels={todo:'To do',started:'In progress',submitted:'Awaiting Parent',redo:'Needs redo',approved:'Approved'};
+let submitToken=null;
+let expiresAt=0;
+const uuidPattern=/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/i;
+async function markComplete(chore, button, noteBox, result, card, pill){
+ if(!submitToken||Date.now()>expiresAt){
+   result.textContent='Your private session expired. Type /984625 chores in Second Life to open a new link.';return;
+ }
+ if(!uuidPattern.test(String(chore.id||''))){result.textContent='This chore has no valid identifier. Ask your Parent for help.';return;}
+ const note=noteBox.value.trim();
+ if(note.length>300){result.textContent='Please shorten your note to 300 characters.';return;}
+ if(!confirm('Submit "'+String(chore.title||'this chore').slice(0,80)+'" to your Parent for approval?'))return;
+ button.disabled=true;result.textContent='Submitting your chore securely…';
+ try{
+   const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},
+     body:JSON.stringify({action:'submit',submit_token:submitToken,chore_id:chore.id,completion_note:note})});
+   const body=await response.json();
+   if(!response.ok||body.ok!==true)throw Error(body.error||'Could not submit your chore');
+   chore.status='submitted';
+   pill.className='pill submitted';pill.textContent='Awaiting Parent';
+   const area=button.closest('.submitArea');
+   if(area){area.replaceChildren(el('div','notice','Submitted! Your Parent can now approve it or request a redo. ⭐'));}
+ }catch(e){
+   result.textContent=(e instanceof Error?e.message:'Unable to submit')+' If the connection failed, reopen your chores to check the status before trying again.';
+   button.disabled=false;
+ }
+}
+
 function el(tag,cls,text) {const n=document.createElement(tag);if(cls)n.className=cls;if(text!==undefined)n.textContent=String(text);return n;}
 function fmtDate(d){if(!d)return'No due date';const parsed=new Date(d);if(!Number.isFinite(parsed.getTime()))return'No due date';return new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',month:'short',day:'numeric',year:'numeric'}).format(parsed)+' SLT';}
 async function load(){
@@ -58,6 +92,9 @@ async function load(){
   const response=await fetch(endpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({action:'redeem',ticket})});
   const body=await response.json();
   if(!response.ok||body.ok!==true)throw Error(body.error||'Could not load your chores');
+  submitToken=typeof body.submit_token==='string'?body.submit_token:null;
+  expiresAt=Date.now()+Math.max(0,Math.min(Number(body.session_seconds)||0,600))*1000;
+  if(!submitToken||!(/^[a-f0-9]{64}$/).test(submitToken))throw Error('Secure submission session was not created');
   const m=body.member||{};
   const icon=el('span','emoji',String(m.profile_emoji||'⭐').slice(0,16));
   const detail=el('div');detail.append(el('b','',m.display_name||'Family member'),el('small','',m.role||'Youth'));
@@ -72,6 +109,16 @@ async function load(){
     if(chore.instructions)card.append(el('p','instruction',chore.instructions));
     card.append(el('div','meta',String(chore.points??0)+' ⭐ points · '+fmtDate(chore.due_at)));
     if(chore.review_note)card.append(el('p','notice','Parent note: '+chore.review_note));
+    if(chore.submission_note)card.append(el('p','notice','Your completion note: '+chore.submission_note));
+    if(['todo','started','redo'].includes(String(chore.status))){
+      const area=el('div','submitArea');
+      const label=el('label','', 'Optional note to your Parent (up to 300 characters)');
+      const noteBox=el('textarea');noteBox.maxLength=300;noteBox.placeholder='All done, Mom!';
+      const button=el('button','','Mark Complete · Ask Parent to Approve');button.type='button';
+      const result=el('div','result');result.setAttribute('role','status');result.setAttribute('aria-live','polite');
+      button.addEventListener('click',()=>{void markComplete(chore,button,noteBox,result,card,badge);});
+      area.append(label,noteBox,button,result);card.append(area);
+    }
     list.append(card);
   }
   status.textContent='Your private chore list is ready. Only this registered avatar’s chores were retrieved.';
