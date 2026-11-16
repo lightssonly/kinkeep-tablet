@@ -215,12 +215,12 @@ const memberList = document.getElementById('memberList');
 const memberStatus = document.getElementById('memberStatus');
 const addMember = document.getElementById('addMember');
 
-async function familyRequest body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
+async function familyRequest(action, data = {}) {
   if (!approvedSession) throw new Error('Sign in again to manage your family.');
   const res = await fetch(familyEndpoint, {
     method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, session_token: approvedSession, ...data }),
+    body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
   });
   const result = await res.json().catch(() => ({}));
   if (!res.ok || result.ok !== true) {
@@ -238,7 +238,6 @@ async function loadMembers() {
   memberStatus.textContent = 'Refreshing registered family…';
   try {
    
-body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
     memberList.replaceChildren();
     const members = Array.isArray(result.members) ? result.members : [];
     if (!members.length) {
@@ -299,12 +298,12 @@ const choreSummary = document.getElementById('choreSummary');
 const choreAssignButton = document.getElementById('choreAssignButton');
 const choreRefreshButton = document.getElementById('refreshChores');
 
-async function body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
+async function choreRequest(action, data = {}) {
   if (!approvedSession) throw new Error('Sign in again to manage chores.');
   const res = await fetch(choreEndpoint, {
     method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ action, session_token: approvedSession, ...data }),
+    body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
   });
   const result = await res.json().catch(() => ({}));
   if (!res.ok || result.ok !== true) {
@@ -342,7 +341,7 @@ async function loadChores() {
   choreStatus.textContent = 'Refreshing real chores…';
   choreRefreshButton.disabled = true;
   try {
-    const data = body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
+    const data = await choreRequest('list');
     const people = Array.isArray(data.members) ? data.members : [];
     const chores = Array.isArray(data.chores) ? data.chores : [];
     const previous = choreRecipient.value;
