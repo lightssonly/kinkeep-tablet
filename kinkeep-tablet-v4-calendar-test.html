@@ -26,7 +26,7 @@
 <script>
 'use strict';const $=id=>document.getElementById(id);
 function time(){const d=new Date(),opts={timeZone:'America/Los_Angeles',hour:'numeric',minute:'2-digit',hour12:true};$('clock').textContent=new Intl.DateTimeFormat('en-US',opts).format(d);$('slt').textContent='SLT · '+$('clock').textContent;$('date').textContent=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',weekday:'long',month:'long',day:'numeric',year:'numeric'}).format(d)}time();setInterval(time,30000);
-function show(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));scrollTo(0,0)}document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
+function show(view){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===view));if(view==='home')safeSharedHome();scrollTo(0,0)}document.querySelectorAll('[data-view]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.view)));
 document.querySelectorAll('[data-jump]').forEach(button=>button.addEventListener('click',()=>{const target=document.getElementById(button.dataset.jump);if(target)target.scrollIntoView({behavior:'auto',block:'start'});}));
 // Local-only notes prototype. Never treated as authentication or permission enforcement.
 const STORE_KEY='kinkeep_notes_v3_LOCAL_DEMO';
@@ -60,4 +60,14 @@ $('saveEvent').addEventListener('click',()=>{const name=$('eventName').value.tri
 $('cancelEditEvent').addEventListener('click',resetEventForm);
 renderEvents();
 
+
+// Shared MOAP never displays locally authored or household-private records as live data.
+function safeSharedHome(){
+ $('pinnedTitle').textContent='Private family note';
+ $('pinnedText').textContent='Open a private KinKeep link from the tablet menu to see your family note.';
+ $('pinnedFrom').textContent='Shared screen · Private data protected';
+ $('homeEvents').replaceChildren();
+ const msg=document.createElement('p');msg.className='muted';msg.textContent='Your actual upcoming events appear in the private Family Home.';$('homeEvents').append(msg);
+}
+safeSharedHome();
 </script></body></html>
