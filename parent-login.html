@@ -207,7 +207,8 @@ form.addEventListener('submit', async (event) => {
 
 // Family management requests are NEVER sent by the shared MOAP. The session
 // token exists only in this private browser tab's memory and is hashed server-side.
-const familyEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-family';
+
+const familyEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-actions';
 const manager = document.getElementById('manager');
 const memberForm = document.getElementById('memberForm');
 const memberList = document.getElementById('memberList');
@@ -236,7 +237,8 @@ async function familyRequest(action, data = {}) {
 async function loadMembers() {
   memberStatus.textContent = 'Refreshing registered family…';
   try {
-    const result = await familyRequest('list');
+   
+body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
     memberList.replaceChildren();
     const members = Array.isArray(result.members) ? result.members : [];
     if (!members.length) {
@@ -286,7 +288,8 @@ memberForm.addEventListener('submit', async event => {
 
 // KinKeep v1.7 — real chores remain ONLY in the private Parent browser tab.
 // approvedSession is created by the existing verified, owner-bound PIN login.
-const choreEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-chores';
+
+const choreEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-actions';
 const choreForm = document.getElementById('choreAssignForm');
 const choreRecipient = document.getElementById('choreRecipient');
 const choreStatus = document.getElementById('choreStatus');
@@ -338,7 +341,7 @@ async function loadChores() {
   choreStatus.textContent = 'Refreshing real chores…';
   choreRefreshButton.disabled = true;
   try {
-    const data = await choreRequest('list');
+    const data = body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
     const people = Array.isArray(data.members) ? data.members : [];
     const chores = Array.isArray(data.chores) ? data.chores : [];
     const previous = choreRecipient.value;
