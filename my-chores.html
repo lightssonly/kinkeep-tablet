@@ -44,7 +44,14 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
   <div id="list"></div>
   <p class="notice">Chores you finish can be submitted to your Parent for approval. Reward points count only after approval. The private page is valid for up to 10 minutes; request a new link if it expires.</p>
 </section>
-<footer>KinKeep v1.9 · Private view · Never share your login link</footer>
+
+<section id="youthHub" hidden>
+<h2>My Rewards ⭐</h2><div id="rewardSummary" class="notice"></div>
+<h2>Daily Routines ⏰</h2><div id="routineSummary" class="notice"></div>
+<h2>Daily Goals 🎯</h2><div id="goalSummary"></div>
+<div id="teenGoalForm" class="submitArea" hidden><label for="goalTitle">New teen daily goal</label><input id="goalTitle" placeholder="Read a book" maxlength="150" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><label for="goalMinutes">Target minutes</label><input id="goalMinutes" type="number" min="1" max="1440" value="20" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><button id="addGoalBtn" type="button" style="margin-top:10px;border:0;border-radius:10px;background:#7251a5;color:#fff;padding:11px 15px;font-weight:bold">Add My Goal</button></div>
+<p id="hubMessage" class="notice" role="status"></p></section>
+<footer>KinKeep v2.0 · Private view · Never share your login link</footer>
 </main>
 <script>
 'use strict';
@@ -123,8 +130,45 @@ async function load(){
   }
   status.textContent='Your private chore list is ready. Only this registered avatar’s chores were retrieved.';
   content.hidden=false;
+  void loadHub();
  }catch(e){status.textContent=(e instanceof Error?e.message:'Could not load your chores')+' — Request a new private link from Second Life.';}
 }
+
+const dashboardEndpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-youth-dashboard';
+let hubRole='';
+const hub=document.getElementById('youthHub');
+const hubMessage=document.getElementById('hubMessage');
+async function hubRequest(action,extra={}){
+ if(!submitToken||Date.now()>expiresAt)throw Error('Session expired. Type /984625 chores for a new private link.');
+ const res=await fetch(dashboardEndpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({action,submit_token:submitToken,...extra})});
+ const data=await res.json();if(!res.ok||data.ok!==true)throw Error(data.error||'Unable to open dashboard');return data;
+}
+async function loadHub(){
+ try{
+  const d=await hubRequest('overview');hubRole=d.role;
+  document.getElementById('rewardSummary').textContent=d.rewards.earned+' ⭐ earned · '+d.rewards.approved+' approved chores · '+d.rewards.pending+' awaiting Parent · '+d.rewards.redo+' need redo';
+  const routineBox=document.getElementById('routineSummary');routineBox.replaceChildren();
+  if(!d.routines.length)routineBox.textContent='No routines assigned yet. Your Parent can add them later.';
+  else d.routines.forEach(x=>routineBox.append(el('p','',x.label+' · '+String(x.time_slt||'').slice(0,5)+' SLT'+(x.reminder_message?' — '+x.reminder_message:''))));
+  const goalBox=document.getElementById('goalSummary');goalBox.replaceChildren();
+  if(!d.goals.length)goalBox.append(el('p','notice',d.role==='Teen'?'Add your first daily goal below!':'No daily goals assigned yet.'));
+  else d.goals.forEach(g=>{
+   const row=el('article','chore');row.append(el('b','',g.title),el('div','meta',g.goal_date+' · '+g.target_minutes+' minutes · '+g.status));
+   if(d.role==='Teen'&&['chosen','started','redo'].includes(g.status)){
+    const b=el('button','','Mark Goal Done');b.type='button';b.style.cssText='margin-top:8px;padding:9px;border:0;border-radius:9px;color:white;background:#7251a5;cursor:pointer';
+    b.onclick=async()=>{b.disabled=true;try{await hubRequest('finish_goal',{goal_id:g.id});await loadHub()}catch(e){hubMessage.textContent=e.message;b.disabled=false}};row.append(b)
+   }goalBox.append(row);
+  });
+  document.getElementById('teenGoalForm').hidden=d.role!=='Teen';
+  hub.hidden=false;hubMessage.textContent='Private '+d.role+' dashboard · Your own records only.';
+ }catch(e){hubMessage.textContent='Extra dashboard sections unavailable: '+e.message;hub.hidden=false;}
+}
+document.getElementById('addGoalBtn').addEventListener('click',async()=>{
+ const b=document.getElementById('addGoalBtn');b.disabled=true;
+ try{await hubRequest('add_goal',{title:document.getElementById('goalTitle').value,target_minutes:Number(document.getElementById('goalMinutes').value)});document.getElementById('goalTitle').value='';await loadHub()}
+ catch(e){hubMessage.textContent=e.message}finally{b.disabled=false}
+});
+
 load();
 </script>
 </body></html>
