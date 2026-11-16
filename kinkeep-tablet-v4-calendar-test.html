@@ -15,6 +15,12 @@ html,body{height:100%;overflow:hidden}body{padding:0}.shell{height:100dvh;min-he
 .view.active::-webkit-scrollbar-thumb{background:#a995c4;border:3px solid #e9e1f1;border-radius:10px}
 .view.active::-webkit-scrollbar-thumb:hover{background:#786198}
 #home.active{display:block!important;overflow-y:scroll!important}
+
+/* Firestorm fallback: explicit touch/click scroll controls */
+#kkScrollControls{position:fixed;right:8px;bottom:16px;z-index:9999;display:flex;flex-direction:column;gap:7px;pointer-events:auto}
+#kkScrollControls button{border:2px solid #fff;background:#6d4aa1;color:#fff;border-radius:12px;width:48px;height:46px;font:bold 22px Arial,sans-serif;box-shadow:0 3px 10px #0004;cursor:pointer}
+#kkScrollControls button:active{background:#42266e}
+.shell{padding-right:58px!important}
 </style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen</div></div><div class="chip" id="slt">SLT · --:--</div></div>
 <section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
 <div class="card"><h2>My Apps ✨</h2><div class="apps"><button class="app" data-view="chores"><span class="em">🧹</span>Chores</button><button class="app" data-view="family"><span class="em">🏡</span>Family</button><button class="app" data-view="calendar"><span class="em">📅</span>Calendar</button><button class="app" data-view="rewards"><span class="em">⭐</span>Rewards</button><button class="app" data-view="notes"><span class="em">💌</span>Notes</button><button class="app" data-view="settings"><span class="em">⚙️</span>Settings</button></div></div>
@@ -83,4 +89,19 @@ function safeSharedHome(){
  const msg=document.createElement('p');msg.className='muted';msg.textContent='Your actual upcoming events appear in the private Family Home.';$('homeEvents').append(msg);
 }
 safeSharedHome();
+
+// Scroll buttons target the active page, even when Firestorm does not forward wheel events.
+(function(){
+ const controls=document.createElement('div');controls.id='kkScrollControls';
+ const up=document.createElement('button'),down=document.createElement('button');
+ up.type=down.type='button';up.textContent='▲';down.textContent='▼';
+ up.setAttribute('aria-label','Scroll page up');down.setAttribute('aria-label','Scroll page down');
+ controls.append(up,down);document.body.append(controls);
+ function scrollPage(direction){
+   const panel=document.querySelector('.view.active');if(!panel)return;
+   const distance=Math.max(180,Math.round(panel.clientHeight*0.6));
+   panel.scrollTop=Math.max(0,Math.min(panel.scrollHeight-panel.clientHeight,panel.scrollTop+direction*distance));
+ }
+ up.addEventListener('click',()=>scrollPage(-1));down.addEventListener('click',()=>scrollPage(1));
+})();
 </script></body></html>
