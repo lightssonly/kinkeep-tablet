@@ -9,6 +9,8 @@ key pendingRequest = NULL_KEY;
 key pendingAvatar = NULL_KEY;
 string pendingType = "";
 key reminderRequest = NULL_KEY;
+integer pendingSince = 0;
+integer reminderSince = 0;
 integer menuHandle;
 integer mainHandle;
 integer youthHandle;
@@ -53,6 +55,7 @@ startPrivate(key avatar, string type)
         HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/json",
         HTTP_BODY_MAXLENGTH, 4096
     ], credentials("begin", avatar));
+    if (pendingRequest != NULL_KEY) pendingSince = llGetUnixTime();
     if (pendingRequest == NULL_KEY) {
         pendingAvatar = NULL_KEY;
         pendingType = "";
@@ -66,6 +69,7 @@ pollReminders()
         HTTP_METHOD, "POST", HTTP_MIMETYPE, "application/json",
         HTTP_BODY_MAXLENGTH, 8192
     ], credentials("due", llGetOwner()));
+    if (reminderRequest != NULL_KEY) reminderSince = llGetUnixTime();
 }
 handleChoice(key avatar, string choice)
 {
@@ -108,6 +112,8 @@ default
         menuHandle = llListen(MENU_CHANNEL, "", NULL_KEY, "");
         pendingRequest = NULL_KEY;
         reminderRequest = NULL_KEY;
+        pendingSince = 0;
+        reminderSince = 0;
         llSetTimerEvent(60.0);
         llOwnerSay("KinKeep: Core v1.2 ready — private access + reminders.");
     }
@@ -133,8 +139,15 @@ default
     }
     timer()
     {
-        // No extra scripts: reminder polling belongs to the Core.
-        // Stale requests are ignored by a fresh request after state reset.
+        integer now = llGetUnixTime();
+        if (reminderRequest != NULL_KEY && now - reminderSince > 90)
+            reminderRequest = NULL_KEY;
+        if (pendingRequest != NULL_KEY && now - pendingSince > 90) {
+            llRegionSayTo(pendingAvatar, 0, "KinKeep: Private link timed out. Try again.");
+            pendingRequest = NULL_KEY;
+            pendingAvatar = NULL_KEY;
+            pendingType = "";
+        }
         pollReminders();
     }
     http_response(key request_id, integer status, list metadata, string body)
