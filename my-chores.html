@@ -149,7 +149,20 @@ async function loadHub(){
   document.getElementById('rewardSummary').textContent=d.rewards.earned+' ⭐ earned · '+d.rewards.approved+' approved chores · '+d.rewards.pending+' awaiting Parent · '+d.rewards.redo+' need redo';
   const routineBox=document.getElementById('routineSummary');routineBox.replaceChildren();
   if(!d.routines.length)routineBox.textContent='No routines assigned yet. Your Parent can add them later.';
-  else d.routines.forEach(x=>routineBox.append(el('p','',x.label+' · '+String(x.time_slt||'').slice(0,5)+' SLT'+(x.reminder_message?' — '+x.reminder_message:''))));
+  else {
+   const nowParts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',weekday:'short',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date());
+   const val=k=>nowParts.find(p=>p.type===k)?.value||'';
+   const today=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(val('weekday'));
+   const currentTime=val('hour')+':'+val('minute');
+   const activeToday=d.routines.filter(x=>Array.isArray(x.days_of_week)&&x.days_of_week.map(Number).includes(today));
+   const heading=el('p','','Today in SLT · '+activeToday.length+' scheduled routine(s)');routineBox.append(heading);
+   d.routines.forEach(x=>{
+    const scheduled=Array.isArray(x.days_of_week)&&x.days_of_week.map(Number).includes(today);
+    const time=String(x.time_slt||'').slice(0,5);
+    const state=scheduled?(time<=currentTime?' · Due or past time today':' · Later today'):' · Another day';
+    routineBox.append(el('p','',x.label+' · '+time+' SLT'+state+(x.reminder_message?' — '+x.reminder_message:'')));
+   });
+  }
   const goalBox=document.getElementById('goalSummary');goalBox.replaceChildren();
   if(!d.goals.length)goalBox.append(el('p','notice',d.role==='Teen'?'Add your first daily goal below!':'No daily goals assigned yet.'));
   else d.goals.forEach(g=>{
