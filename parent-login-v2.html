@@ -145,7 +145,9 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="saveRoutine" type="submit">Save Routine</button></form>
 <button type="button" id="refreshRoutines" class="secondary">Refresh Routines</button><div id="routineStatus" role="status" aria-live="polite"></div><div id="routineList"></div>
 </section>
-</section>
+<section id="sharedManager" style="border-top:1px solid #e7dfef;margin-top:25px;padding-top:14px"><h2>📝 Shared Family Notes</h2>
+<form id="newNoteForm"><label>Title<input id="sharedNoteTitle" maxlength="150" required placeholder="Family reminder"></label><label>Message<textarea id="sharedNoteMessage" maxlength="2000" required style="width:100%;height:90px"></textarea></label><label style="display:flex;gap:8px;align-items:center"><input id="sharedNotePinned" type="checkbox" style="width:auto"> Pin to family notes</label><button type="submit">Save Family Note</button></form><div id="sharedNotes"></div>
+<h2>📅 Family Calendar</h2><form id="newEventForm"><label>Event<input id="sharedEventTitle" maxlength="150" required placeholder="Anaya soccer game"></label><label>Date<input id="sharedEventDate" type="date" required style="font-size:14px;letter-spacing:normal;text-align:left"></label><label>Details<input id="sharedEventDetails" maxlength="1000" placeholder="Optional location or details"></label><button type="submit">Add Calendar Event</button></form><div id="sharedEvents"></div><p id="sharedStatus" role="status"></p><button type="button" class="secondary" id="refreshShared">Refresh Notes & Calendar</button></section></section>
 <footer>KinKeep v1.9 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
 </main>
 <script>
@@ -219,6 +221,7 @@ form.addEventListener('submit', async (event) => {
         void loadMembers();
         void loadChores();
         void loadRoutines();
+        void loadShared();
       }
     } else {
       statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
@@ -518,6 +521,43 @@ document.getElementById('routineForm').addEventListener('submit',async e=>{
  catch(err){routineStatus.textContent=err.message}finally{button.disabled=false}
 });
 
+const sharedEndpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-family-shared';
+const sharedStatus=document.getElementById('sharedStatus');
+async function sharedCall(action,data={}){
+ if(!approvedSession||Date.now()>sessionDeadline)throw Error('Parent session expired. Sign in again.');
+ const r=await fetch(sharedEndpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({scope:'parent',action,session_token:approvedSession,...data})});
+ const x=await r.json();if(!r.ok||x.ok!==true)throw Error(x.error||'Family request failed');return x;
+}
+async function loadShared(){
+ if(!approvedSession)return;
+ try{
+  const d=await sharedCall('list');
+  const notes=document.getElementById('sharedNotes');notes.replaceChildren();
+  d.notes.forEach(n=>{
+   const card=document.createElement('article');card.className='choreCard';
+   const txt=document.createElement('p');txt.textContent=(n.is_pinned?'📌 ':'')+n.title+': '+n.message;card.append(txt);
+   const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='Delete note';
+   b.onclick=async()=>{if(!confirm('Delete this note?'))return;b.disabled=true;try{await sharedCall('delete_note',{id:n.id});await loadShared()}catch(e){sharedStatus.textContent=e.message;b.disabled=false}};
+   card.append(b);notes.append(card);
+  });
+  const events=document.getElementById('sharedEvents');events.replaceChildren();
+  d.events.forEach(e=>{
+   const card=document.createElement('article');card.className='choreCard';
+   const txt=document.createElement('p');txt.textContent=e.event_date+' · '+e.title+(e.details?' — '+e.details:'');card.append(txt);
+   const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='Delete event';
+   b.onclick=async()=>{if(!confirm('Delete event?'))return;b.disabled=true;try{await sharedCall('delete_event',{id:e.id});await loadShared()}catch(e){sharedStatus.textContent=e.message;b.disabled=false}};
+   card.append(b);events.append(card);
+  });
+  sharedStatus.textContent=d.notes.length+' family notes · '+d.events.length+' calendar events';
+ }catch(e){sharedStatus.textContent=e.message}
+}
+document.getElementById('refreshShared').onclick=()=>void loadShared();
+document.getElementById('newNoteForm').onsubmit=async e=>{
+ e.preventDefault();try{await sharedCall('add_note',{title:document.getElementById('sharedNoteTitle').value,message:document.getElementById('sharedNoteMessage').value,is_pinned:document.getElementById('sharedNotePinned').checked});e.target.reset();await loadShared()}catch(x){sharedStatus.textContent=x.message}
+};
+document.getElementById('newEventForm').onsubmit=async e=>{
+ e.preventDefault();try{await sharedCall('add_event',{title:document.getElementById('sharedEventTitle').value,event_date:document.getElementById('sharedEventDate').value,details:document.getElementById('sharedEventDetails').value});e.target.reset();await loadShared()}catch(x){sharedStatus.textContent=x.message}
+};
 window.addEventListener('pagehide', () => {
   approvedSession = null;
   ticket = null;
