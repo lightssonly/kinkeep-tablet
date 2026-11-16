@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<title>KinKeep — Private Parent Login</title>
+<style>
+:root{font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#302b40;background:#f1edf8}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;padding:22px;display:grid;place-items:center}
+main{width:min(100%,430px);background:white;border:1px solid #e9e1f3;border-radius:23px;padding:30px;box-shadow:0 15px 45px #352d5519}
+.brand{color:#7a59a8;font-size:14px;font-weight:800;letter-spacing:.03em}
+h1{font-size:25px;letter-spacing:-.04em;margin:8px 0 9px}
+p{font-size:14px;line-height:1.55;color:#675e78}
+.info{background:#f6f1fe;color:#564579;padding:13px;border-radius:12px;margin:18px 0;font-size:13px;line-height:1.5}
+label{display:block;margin:17px 0 7px;font-size:13px;font-weight:750}
+input{width:100%;border:1px solid #c9bfda;border-radius:12px;padding:13px;font-size:24px;letter-spacing:.3em;text-align:center;color:#2f2940;background:white}
+input:focus{outline:2px solid #977cc9;outline-offset:1px}
+button{width:100%;border:0;background:#7457aa;color:white;padding:14px;margin-top:21px;border-radius:12px;font-size:15px;font-weight:800;cursor:pointer}
+button:disabled{opacity:.6;cursor:default}
+#status{margin-top:15px;min-height:24px;font-size:13px;font-weight:650;overflow-wrap:anywhere}
+footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
+
+/* v1.5 private Family Manager */
+#manager{border-top:1px solid #e8e0ef;margin-top:20px;padding-top:14px}
+#manager h2{font-size:21px;margin:8px 0 5px}
+#manager h3{font-size:16px;margin:16px 0 6px}
+#manager label{margin:11px 0 5px}
+#manager input,#manager select{font-size:14px;letter-spacing:normal;text-align:left;padding:11px;display:block;width:100%;border:1px solid #c9bfda;border-radius:10px;color:#2f2940;background:white}
+#manager button{margin-top:12px;padding:11px;font-size:14px}
+#manager button.secondary{background:#f5f0fd;color:#514276;border:1px solid #c9bfda}
+#memberList{padding:0;list-style:none;margin:8px 0;display:grid;gap:6px}
+#memberList li{font-size:13px;line-height:1.45;background:#f7f3fc;padding:11px;border-radius:10px;overflow-wrap:anywhere}
+#manager .help{font-size:12px;line-height:1.4;color:#6b6179}
+#memberStatus{font-size:13px;margin-top:10px;overflow-wrap:anywhere}
+#manager .tiny{font-size:11px;color:#756b83}
+
+/* v1.7 private, real Supabase Chores Manager */
+#choresManager{border-top:1px solid #e7dfef;padding-top:18px;margin-top:24px}
+#choresManager h2{font-size:20px;margin:5px 0}
+#choresManager h3{font-size:16px;margin:16px 0 8px}
+#choresManager textarea{width:100%;min-height:84px;resize:vertical;padding:12px;border-radius:10px;border:1px solid #c9bfda;font:inherit;color:#2f2940}
+#choresManager input[type=date],#choresManager input[type=number]{font-size:14px;letter-spacing:normal;text-align:left}
+#choresManager .choreGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+#choresManager .choreGrid>*{min-width:0}
+#choresManager .choreCard{border:1px solid #e4dcee;border-radius:12px;padding:12px;background:#faf8fd;margin:9px 0}
+#choresManager .choreCard p{margin:6px 0}
+#choresManager .choreMeta{font-size:12px;color:#665b77;line-height:1.5}
+#choresManager .chorePill{display:inline-block;padding:3px 8px;border-radius:100px;background:#eae1f5;color:#514276;font-size:11px;font-weight:800}
+#choresManager .chorePill.approved{background:#e2f4e8;color:#21683f}
+#choresManager .chorePill.submitted{background:#fff0d5;color:#8f590e}
+#choresManager .reviewBtns{display:flex;gap:8px}
+#choresManager .reviewBtns button{flex:1;margin-top:8px}
+#choresManager .reviewBtns .redo{background:#eee6f7;color:#514276}
+#choresManager .summary{padding:11px;background:#f6f1fe;border-radius:10px;font-size:12px;color:#514276;line-height:1.7}
+#choreStatus{margin-top:10px;font-size:13px;overflow-wrap:anywhere}
+@media(max-width:390px){#choresManager .choreGrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<div class="brand">✿ KinKeep</div>
+<h1>Parent Access</h1>
+<p>Enter the shared 4-digit Parent PIN. Your registered Second Life tablet has already verified the owner before opening this page.</p>
+<div class="info" id="notice" role="status">Checking your private login link…</div>
+<form id="form" autocomplete="off" hidden>
+<label for="pin">Your 4-digit Parent PIN</label>
+<input id="pin" type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" autocomplete="off" placeholder="••••" required>
+<button id="submit" type="submit">Verify Parent PIN</button>
+</form>
+<p id="status" aria-live="polite"></p>
+
+<section id="manager" hidden>
+<button type="button" class="secondary" id="closeParentAccess">Close Parent Access</button>
+<h2>🏡 Parent Family Manager</h2>
+<p>You're signed in as the registered owner. Add real family members to your KinKeep household. Changes here are stored in Supabase—not the demo Family editor.</p>
+<div class="info">🔒 Only your registered Parent session can make changes. This first version adds Youth, Teen, Adult, Caregiver, or Custom members. Additional Parent enrollment will have its own secure flow.</div>
+<h3>👥 Registered family</h3>
+<ul id="memberList"><li>Loading your family…</li></ul>
+<button type="button" class="secondary" id="refreshList">Refresh family list</button>
+<h3>➕ Add family member</h3>
+<form id="memberForm" autocomplete="off">
+<label for="display_name">Display name</label>
+<input id="display_name" name="display_name" type="text" maxlength="80" placeholder="e.g., River" required>
+<label for="avatar_uuid">Second Life avatar UUID</label>
+<input id="avatar_uuid" name="avatar_uuid" type="text" maxlength="36" spellcheck="false" autocapitalize="none" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" pattern="[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}" required>
+<p class="help">Use the avatar's actual UUID, not their display name. This lets KinKeep match the member securely later.</p>
+<label for="role">Household role</label>
+<select name="role" id="role" required>
+<option value="Youth">Youth</option><option value="Teen">Teen</option><option value="Adult">Adult</option><option value="Caregiver">Caregiver / Nanny</option><option value="Custom">Custom</option>
+</select>
+<label for="custom_role_label">Relationship label (optional; required for Custom role)</label>
+<input id="custom_role_label" name="custom_role_label" maxlength="40" placeholder="e.g., Aunt, Grandma, Nanny">
+<label for="profile_emoji">Profile emoji</label>
+<select name="profile_emoji" id="profile_emoji">
+<option>🦋</option><option>🐼</option><option>🌸</option><option>🦊</option><option>⭐</option><option>🌻</option><option>🐻</option><option>🐝</option><option>🐬</option><option>🌈</option><option>🍓</option><option>🍀</option><option>🐱</option><option>🐶</option><option>🪷</option><option>🧸</option>
+</select>
+<button type="submit" id="addMember">Add Family Member</button>
+</form>
+<div id="memberStatus" role="status" aria-live="polite"></div>
+<p class="tiny">After adding a member, return to Firestorm and type <b>/984619 show</b> to refresh the tablet's live roster. One household at a time; no information is shared with other families.</p>
+
+
+<section id="choresManager">
+  <h2>🧹 Real Chore Assignments</h2>
+  <p>Assign real chores to registered Youth and Teen avatars. These are saved in your Supabase household, not the tablet's old demo chore list.</p>
+  <div class="info">🔐 Owner-only pilot: a verified Parent session is required. Each assignment has its own status, points, and optional SLT due date. Youth/Teen self-submission will be added in the next development phase.</div>
+  <h3>➕ Assign a chore</h3>
+  <form id="choreAssignForm" autocomplete="off">
+    <label for="choreRecipient">Assign to</label>
+    <select id="choreRecipient" required><option value="">Loading eligible family members…</option></select>
+    <label for="choreTitle">Chore</label>
+    <input id="choreTitle" maxlength="150" required list="choreSuggestions" placeholder="e.g., Wash the dishes">
+    <datalist id="choreSuggestions">
+      <option value="Wash the dishes"><option value="Clean the bathroom"><option value="Put away laundry">
+      <option value="Tidy your bedroom"><option value="Take out the trash"><option value="Finish homework">
+      <option value="Feed the pets"><option value="Mop the floor"><option value="Put away toys">
+    </datalist>
+    <label for="choreInstructions">Instructions (optional)</label>
+    <textarea id="choreInstructions" maxlength="1000" placeholder="What should they do to complete this chore?"></textarea>
+    <div class="choreGrid">
+      <div><label for="chorePoints">Reward points</label><input id="chorePoints" type="number" min="0" max="10000" step="1" value="10" required></div>
+      <div><label for="choreDue">Due date (SLT, optional)</label><input id="choreDue" type="date"></div>
+    </div>
+    <p class="help">SLT uses Pacific time. If you choose a date, the chore is due at 11:59 p.m. SLT that day. Points are earned after Parent approval, not when the chore is first assigned.</p>
+    <button id="choreAssignButton" type="submit">Assign Chore</button>
+  </form>
+  <div id="choreStatus" aria-live="polite" role="status"></div>
+  <h3>📋 Household chores</h3>
+  <button type="button" class="secondary" id="refreshChores">Refresh chore list</button>
+  <p class="help">Recent 100 chores appear below. Pending review means a child submitted the chore. You can now Approve (count points) or request Redo with a note.</p>
+  <div id="choreSummary" class="summary">Loading household chores…</div>
+  <div id="choreList" aria-live="polite"></div>
+</section>
+</section>
+<footer>KinKeep v1.9 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
+</main>
+<script>
+'use strict';
+const endpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-login-v2';
+const notice = document.getElementById('notice');
+const form = document.getElementById('form');
+const statusLine = document.getElementById('status');
+const submit = document.getElementById('submit');
+const match = location.hash.match(/^#login=([a-fA-F0-9]{32})$/);
+let ticket = match ? match[1].toLowerCase() : null;
+// The server session stays only in this page's memory. It is not saved in
+// a cookie, URL, localStorage, or the public/shared in-world media browser.
+let approvedSession = null;
+let sessionDeadline = 0;
+let sessionTimer = null;
+function closeAccess() {
+  approvedSession = null;
+  sessionDeadline = 0;
+  if (sessionTimer !== null) clearTimeout(sessionTimer);
+  sessionTimer = null;
+  document.getElementById("manager").hidden = true;
+}
+document.getElementById("closeParentAccess").addEventListener("click", () => {
+  closeAccess();
+  statusLine.textContent = "Parent Access closed in this tab. Server session expires separately.";
+});
+if (ticket) {
+  try { history.replaceState(null, '', location.pathname); } catch { /* no persistence */ }
+  notice.textContent = 'Your private Parent login request is ready. Enter the shared four-digit Parent PIN.';
+  form.hidden = false;
+} else {
+  notice.textContent = 'To unlock Parent Access, request login from the registered Parent avatar on the KinKeep tablet. Open the private URL prompt.';
+}
+form.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  if (submit.disabled || !ticket) return;
+  const pinField = document.getElementById('pin');
+  const pin = pinField.value;
+  if (!/^[0-9]{4}$/.test(pin)) {
+    statusLine.textContent = 'Enter exactly four digits.';
+    return;
+  }
+  submit.disabled = true;
+  statusLine.textContent = 'Verifying Parent Access securely…';
+  try {
+    const response = await fetch(endpoint, {
+      method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'complete', login_ticket: ticket, pin }),
+    });
+    const result = await response.json().catch(() => ({}));
+    if (response.ok && result.ok === true && result.verified === true) {
+      approvedSession = typeof result.session_token === 'string' ? result.session_token : null;
+      if (approvedSession) {
+        const seconds = Math.min(600, Math.max(1, Number(result.expires_in_seconds) || 600));
+        sessionDeadline = Date.now() + seconds * 1000;
+        if (sessionTimer !== null) clearTimeout(sessionTimer);
+        sessionTimer = setTimeout(() => {
+          closeAccess();
+          statusLine.textContent = 'Parent session expired. Please sign in again.';
+        }, seconds * 1000);
+      }
+      ticket = null;
+      form.reset();
+      form.hidden = true;
+      notice.textContent = '✓ Parent identity and PIN verified!';
+      statusLine.textContent = 'Success! Your secure session lasts up to 10 minutes.';
+      if (approvedSession) {
+        document.getElementById('manager').hidden = false;
+        void loadMembers();
+        void loadChores();
+      }
+    } else {
+      statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
+      if (response.status === 403 && /expired|already used/i.test(statusLine.textContent)) {
+        ticket = null;
+        form.hidden = true;
+      } else if (response.status === 423) {
+        ticket = null;
+        form.hidden = true;
+      } else {
+        submit.disabled = false;
+      }
+    }
+  } catch {
+    statusLine.textContent = 'Connection error. Check the Parent Login Edge Function and try again.';
+    submit.disabled = false;
+  } finally {
+    pinField.value = '';
+  }
+});
+
+// Family management requests are NEVER sent by the shared MOAP. The session
+// token exists only in this private browser tab's memory and is hashed server-side.
+
+const familyEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-actions';
+const manager = document.getElementById('manager');
+const memberForm = document.getElementById('memberForm');
+const memberList = document.getElementById('memberList');
+const memberStatus = document.getElementById('memberStatus');
+const addMember = document.getElementById('addMember');
+
+async function familyRequest(action, data = {}) {
+  if (!approvedSession) throw new Error('Sign in again to manage your family.');
+  const res = await fetch(familyEndpoint, {
+    method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok || result.ok !== true) {
+    if (res.status === 403) {
+      approvedSession = null;
+      manager.hidden = true;
+      statusLine.textContent = 'Your Parent session has ended. Type /984622 unlock in Second Life to sign in again.';
+    }
+    throw new Error(typeof result.error === 'string' ? result.error : 'The family request failed.');
+  }
+  return result;
+}
+
+async function loadMembers() {
+  memberStatus.textContent = 'Refreshing registered family…';
+  try {
+    const result = await familyRequest('list');
+    memberList.replaceChildren();
+    const members = Array.isArray(result.members) ? result.members : [];
+    if (!members.length) {
+      const li = document.createElement('li'); li.textContent = 'No registered family members yet.'; memberList.appendChild(li);
+    }
+    for (const member of members) {
+      const li = document.createElement('li');
+      const label = member.custom_role_label ? ' · ' + member.custom_role_label : '';
+      const owner = member.is_owner ? ' · Primary Parent' : '';
+      li.textContent = `${member.profile_emoji || '⭐'} ${member.display_name || 'Unnamed'} · ${member.role || 'Member'}${label}${owner}`;
+      memberList.appendChild(li);
+    }
+    memberStatus.textContent = `${members.length} active family member(s).`;
+  } catch (error) {
+    memberStatus.textContent = error instanceof Error ? error.message : 'Could not refresh family members.';
+  }
+}
+document.getElementById('refreshList').addEventListener('click', () => { void loadMembers(); });
+memberForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (addMember.disabled || !approvedSession) return;
+  const details = Object.fromEntries(new FormData(memberForm));
+  const name = String(details.display_name || '').trim();
+  const avatar = String(details.avatar_uuid || '').trim().toLowerCase();
+  const role = String(details.role || '');
+  const label = String(details.custom_role_label || '').trim();
+  const emoji = String(details.profile_emoji || '⭐');
+  if (!/^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(avatar) || !name || (role === 'Custom' && !label)) {
+    memberStatus.textContent = 'Enter a valid avatar UUID, name, and relationship label if Custom.';
+    return;
+  }
+  addMember.disabled = true;
+  memberStatus.textContent = 'Registering family member securely…';
+  try {
+    await familyRequest('add', { avatar_uuid: avatar, display_name: name, role, custom_role_label: label, profile_emoji: emoji });
+    memberForm.reset();
+    memberStatus.textContent = 'Member added to Supabase! In Firestorm, type /984619 show to update the live tablet roster.';
+    await loadMembers();
+    await loadChores();
+  } catch (error) {
+    memberStatus.textContent = error instanceof Error ? error.message : 'Could not register member.';
+  } finally {
+    addMember.disabled = false;
+  }
+});
+
+
+// KinKeep v1.7 — real chores remain ONLY in the private Parent browser tab.
+// approvedSession is created by the existing verified, owner-bound PIN login.
+
+  
+const choreEndpoint = 'https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-actions';
+const choreForm = document.getElementById('choreAssignForm');
+const choreRecipient = document.getElementById('choreRecipient');
+const choreStatus = document.getElementById('choreStatus');
+const choreList = document.getElementById('choreList');
+const choreSummary = document.getElementById('choreSummary');
+const choreAssignButton = document.getElementById('choreAssignButton');
+const choreRefreshButton = document.getElementById('refreshChores');
+
+async function choreRequest(action, data = {}) {
+  if (!approvedSession) throw new Error('Sign in again to manage chores.');
+  const res = await fetch(choreEndpoint, {
+    method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
+  });
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok || result.ok !== true) {
+    if (res.status === 403) {
+      approvedSession = null;
+      manager.hidden = true;
+      statusLine.textContent = 'Parent session expired or locked. Type /984622 unlock in Second Life to sign in again.';
+    }
+    throw new Error(typeof result.error === 'string' ? result.error : 'Chore request failed.');
+  }
+  return result;
+}
+
+function newEl(tag, className, content) {
+  const el = document.createElement(tag);
+  if (className) el.className = className;
+  if (content != null) el.textContent = String(content);
+  return el;
+}
+function displaySlt(iso) {
+  if (!iso) return 'No due date';
+  try {
+    const dt = new Date(iso);
+    if (Number.isNaN(dt.valueOf())) return 'Due date unavailable';
+    return 'Due ' + new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles', month:'short', day:'numeric', year:'numeric',
+      hour:'numeric', minute:'2-digit'
+    }).format(dt) + ' SLT';
+  } catch { return 'Due date unavailable'; }
+}
+const statusLabels = { todo: 'To do', started: 'Started', submitted: 'Waiting for Parent', redo: 'Redo requested', approved: 'Approved' };
+
+async function loadChores() {
+  if (!approvedSession) return;
+  choreStatus.textContent = 'Refreshing real chores…';
+  choreRefreshButton.disabled = true;
+  try {
+    const data = await choreRequest('list');
+    const people = Array.isArray(data.members) ? data.members : [];
+    const chores = Array.isArray(data.chores) ? data.chores : [];
+    const previous = choreRecipient.value;
+    choreRecipient.replaceChildren();
+    if (!people.length) {
+      choreRecipient.appendChild(newEl('option', '', 'Add a Youth or Teen in Family Manager first.'));
+      choreRecipient.disabled = true;
+      choreAssignButton.disabled = true;
+    } else {
+      for (const m of people) {
+        const opt = newEl('option', '', `${m.profile_emoji || '⭐'} ${m.display_name || 'Member'} · ${m.role || ''}`);
+        opt.value = String(m.id || '');
+        choreRecipient.appendChild(opt);
+      }
+      if ([...choreRecipient.options].some(o => o.value === previous)) choreRecipient.value = previous;
+      choreRecipient.disabled = false;
+      choreAssignButton.disabled = false;
+    }
+    const waiting = chores.filter(c => c.status === 'submitted').length;
+    const active = chores.filter(c => ['todo', 'started', 'redo'].includes(c.status)).length;
+    const approved = chores.filter(c => c.status === 'approved').length;
+    const pointSummary = people.map(m => `${m.profile_emoji || '⭐'} ${m.display_name || 'Member'}: ${Number(m.earned_points || 0)} earned`).join('  •  ');
+    choreSummary.textContent = `${active} active · ${waiting} awaiting review · ${approved} approved` + (pointSummary ? `
+${pointSummary}` : '');
+    choreSummary.style.whiteSpace = 'pre-line';
+    choreList.replaceChildren();
+    if (!chores.length) choreList.appendChild(newEl('p', 'help', 'No real chores yet. Assign your first one above!'));
+    for (const c of chores) {
+      const card = newEl('article', 'choreCard');
+      const h = newEl('strong', '', `${c.member_emoji || '⭐'} ${c.member_name || 'Member'} — ${c.title || 'Chore'}`);
+      card.appendChild(h);
+      const status = String(c.status || 'todo');
+      card.appendChild(document.createTextNode(' '));
+      card.appendChild(newEl('span', 'chorePill ' + status, statusLabels[status] || status));
+      card.appendChild(newEl('p', 'choreMeta', `${Number(c.points || 0)} points · ${displaySlt(c.due_at)}`));
+      if (c.instructions) card.appendChild(newEl('p', '', c.instructions));
+      if (c.review_note) card.appendChild(newEl('p', 'choreMeta', 'Parent note: ' + c.review_note));
+      if (c.submission_note) card.appendChild(newEl('p', 'choreMeta', 'Youth completion note: ' + c.submission_note));
+      if (status === 'submitted') {
+        const note = newEl('textarea');
+        note.maxLength = 500;
+        note.placeholder = 'Optional approval note; required if requesting redo';
+        note.setAttribute('aria-label', `Review note for ${c.title || 'chore'}`);
+        card.appendChild(note);
+        const actions = newEl('div', 'reviewBtns');
+        const approve = newEl('button', '', 'Approve');
+        const redo = newEl('button', 'redo', 'Request Redo');
+        approve.type = redo.type = 'button';
+        approve.addEventListener('click', () => { void reviewChore(c.id, 'approve', note.value, [approve, redo]); });
+        redo.addEventListener('click', () => { void reviewChore(c.id, 'redo', note.value, [approve, redo]); });
+        actions.append(approve, redo);
+        card.appendChild(actions);
+      }
+      choreList.appendChild(card);
+    }
+    choreStatus.textContent = `Chore list refreshed. ${chores.length} recent assignment(s).`;
+  } catch (err) {
+    choreStatus.textContent = err instanceof Error ? err.message : 'Unable to load chores.';
+  } finally {
+    choreRefreshButton.disabled = false;
+  }
+}
+async function reviewChore(choreId, action, note, buttons) {
+  if (action === 'redo' && !String(note || '').trim()) {
+    choreStatus.textContent = 'Please explain what needs to be redone.';
+    return;
+  }
+  if (action === 'approve' && !confirm('Approve this submitted chore and award its points?')) return;
+  buttons.forEach(b => { b.disabled = true; });
+  try {
+    await choreRequest(action, { chore_id: choreId, review_note: note.trim() });
+    await loadChores();
+    choreStatus.textContent = action === 'approve' ? 'Chore approved and points counted!' : 'Redo requested and recorded.';
+  } catch (err) {
+    choreStatus.textContent = err instanceof Error ? err.message : 'Unable to review chore.';
+    buttons.forEach(b => { b.disabled = false; });
+  }
+}
+choreForm.addEventListener('submit', async event => {
+  event.preventDefault();
+  if (!approvedSession || choreAssignButton.disabled) return;
+  const member = choreRecipient.value;
+  const title = document.getElementById('choreTitle').value.trim();
+  const instructions = document.getElementById('choreInstructions').value.trim();
+  const points = Number(document.getElementById('chorePoints').value);
+  const due = document.getElementById('choreDue').value;
+  if (!member || title.length < 1 || title.length > 150 || !Number.isInteger(points) || points < 0 || points > 10000) {
+    choreStatus.textContent = 'Choose a Youth/Teen, a chore title, and whole-number points (0–10000).';
+    return;
+  }
+  choreAssignButton.disabled = true;
+  choreStatus.textContent = 'Saving real chore to Supabase…';
+  try {
+    await choreRequest('assign', { member_id: member, title, instructions, points, due_slt_date: due });
+    document.getElementById('choreTitle').value = '';
+    document.getElementById('choreInstructions').value = '';
+    document.getElementById('choreDue').value = '';
+    await loadChores();
+    choreStatus.textContent = 'Chore saved to Supabase! Your Youth or Teen can now submit it from their private My Chores page.';
+  } catch (err) {
+    choreStatus.textContent = (err instanceof Error ? err.message : 'Could not save chore.') + ' If the network failed, refresh the list before trying again to avoid duplicates.';
+  } finally {
+    if (approvedSession && !choreRecipient.disabled) choreAssignButton.disabled = false;
+  }
+});
+choreRefreshButton.addEventListener('click', () => { void loadChores(); });
+
+window.addEventListener('pagehide', () => {
+  approvedSession = null;
+  ticket = null;
+  manager.hidden = true;
+});
+</script>
+</body>
+</html>
