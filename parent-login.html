@@ -298,7 +298,7 @@ const choreSummary = document.getElementById('choreSummary');
 const choreAssignButton = document.getElementById('choreAssignButton');
 const choreRefreshButton = document.getElementById('refreshChores');
 
-async function choreRequest body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
+async function body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
   if (!approvedSession) throw new Error('Sign in again to manage chores.');
   const res = await fetch(choreEndpoint, {
     method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
