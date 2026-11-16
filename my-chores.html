@@ -51,7 +51,7 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
 <h2>Daily Goals 🎯</h2><div id="goalSummary"></div>
 <div id="teenGoalForm" class="submitArea" hidden><label for="goalTitle">New teen daily goal</label><input id="goalTitle" placeholder="Read a book" maxlength="150" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><label for="goalMinutes">Target minutes</label><input id="goalMinutes" type="number" min="1" max="1440" value="20" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><button id="addGoalBtn" type="button" style="margin-top:10px;border:0;border-radius:10px;background:#7251a5;color:#fff;padding:11px 15px;font-weight:bold">Add My Goal</button></div>
 <p id="hubMessage" class="notice" role="status"></p></section>
-<section id="familyShared" hidden><h2>📌 Family Notes</h2><div id="familySharedNotes" class="notice"></div><h2>📅 Family Calendar</h2><div id="familySharedEvents" class="notice"></div><p id="familySharedStatus" class="meta"></p></section>
+<section id="privateFamilyHome" hidden><h2>🏡 Family Home</h2><div class="notice"><strong>📌 Pinned Family Note</strong><p id="privatePinnedNote">Loading…</p></div><div class="notice" style="margin-top:10px"><strong>📅 Coming Up</strong><div id="privateUpcoming">Loading…</div></div></section><section id="familyShared" hidden><h2>📌 Family Notes</h2><div id="familySharedNotes" class="notice"></div><h2>📅 Family Calendar</h2><div id="familySharedEvents" class="notice"></div><p id="familySharedStatus" class="meta"></p></section>
 <footer>KinKeep v2.0 · Private view · Never share your login link</footer>
 </main>
 <script>
@@ -198,6 +198,16 @@ async function loadFamilyShared(){
   const events=document.getElementById('familySharedEvents');events.replaceChildren();
   for(const e of d.events)events.append(el('p','',e.event_date+' · '+e.title+(e.details?' — '+e.details:'')));
   if(!d.events.length)events.textContent='No calendar events yet.';
+  const pinnedNote=d.notes.find(n=>n.is_pinned);
+  document.getElementById('privatePinnedNote').textContent=pinnedNote?pinnedNote.title+' — '+pinnedNote.message:'No pinned family note yet.';
+  const upcoming=document.getElementById('privateUpcoming');upcoming.replaceChildren();
+  const todayParts=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const getPart=k=>todayParts.find(x=>x.type===k)?.value||'';
+  const sltToday=getPart('year')+'-'+getPart('month')+'-'+getPart('day');
+  const upcomingEvents=d.events.filter(e=>e.event_date>=sltToday).slice(0,5);
+  for(const e of upcomingEvents)upcoming.append(el('p','',e.event_date+' · '+e.title));
+  if(!upcomingEvents.length)upcoming.textContent='No upcoming events scheduled.';
+  document.getElementById('privateFamilyHome').hidden=false;
   msg.textContent='Shared notes and calendar loaded privately.';container.hidden=false;
  }catch(e){msg.textContent=e.message;container.hidden=false}
 }
