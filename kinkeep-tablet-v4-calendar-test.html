@@ -21,8 +21,9 @@ html,body{height:100%;overflow:hidden}body{padding:0}.shell{height:100dvh;min-he
 #kkScrollControls button{border:2px solid #fff;background:#6d4aa1;color:#fff;border-radius:12px;width:48px;height:46px;font:bold 22px Arial,sans-serif;box-shadow:0 3px 10px #0004;cursor:pointer}
 #kkScrollControls button:active{background:#42266e}
 .shell{padding-right:58px!important}
-</style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen <strong style="color:#6946a0">· v1.5</strong></div></div><div class="chip" id="slt">SLT · --:--</div></div>
-<div id="kkNavButtons" style="display:flex;gap:9px;align-items:center;justify-content:flex-end;padding:4px 0 7px;flex-shrink:0"><span style="margin-right:auto;font-size:12px;font-weight:bold;color:#4d3577">Screen controls v1.5</span><button id="kkPageUp" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▲ UP</button><button id="kkPageDown" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▼ DOWN</button></div><section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
+#home .kkDiscretePage .home-optional,#home .kkDiscretePage .home-extra{display:block!important}#kkNavButtons button:disabled{opacity:.45}#home .kkDiscretePage{min-height:0}
+</style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen <strong style="color:#6946a0">· v1.6</strong></div></div><div class="chip" id="slt">SLT · --:--</div></div>
+<div id="kkNavButtons" style="display:flex;gap:9px;align-items:center;justify-content:flex-end;padding:4px 0 7px;flex-shrink:0"><span style="margin-right:auto;font-size:12px;font-weight:bold;color:#4d3577">Page navigation v1.6</span><button id="kkPageUp" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▲ UP</button><button id="kkPageDown" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▼ DOWN</button></div><section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
 <div class="card"><h2>My Apps ✨</h2><div class="apps"><button class="app" data-view="chores"><span class="em">🧹</span>Chores</button><button class="app" data-view="family"><span class="em">🏡</span>Family</button><button class="app" data-view="calendar"><span class="em">📅</span>Calendar</button><button class="app" data-view="rewards"><span class="em">⭐</span>Rewards</button><button class="app" data-view="notes"><span class="em">💌</span>Notes</button><button class="app" data-view="settings"><span class="em">⚙️</span>Settings</button></div></div>
 <div class="card" id="homePinCard"><div class="between"><h2>📌 Family Note</h2><button class="secondary smallbtn" data-view="notes">Open Notes</button></div><div class="note"><div class="between"><strong id="pinnedTitle">Demo Home Note 💛</strong><span>💌</span></div><p id="pinnedText">Real family notes are available in your private KinKeep dashboard.</p><div class="sub" id="pinnedFrom">KinKeep · Demo only</div></div></div>
 <div class="grid2 home-extra"><div class="tile"><strong>🌞 Today's Routine</strong><p class="muted">Daily routine setup is coming.</p></div><div class="tile" id="homeComingCard"><strong>📅 Coming Up</strong><div id="homeEvents" class="stack" style="margin-top:8px"><p class="muted">No upcoming events yet.</p></div><button class="secondary smallbtn" data-view="calendar" style="margin-top:9px">Open Calendar</button></div></div>
@@ -105,5 +106,60 @@ document.getElementById('kkPageDown').addEventListener('click',()=>{const p=docu
    panel.scrollTop=Math.max(0,Math.min(panel.scrollHeight-panel.clientHeight,panel.scrollTop+direction*distance));
  }
  up.addEventListener('click',()=>scrollPage(-1));down.addEventListener('click',()=>scrollPage(1));
+})();
+
+// MOAP page-by-page navigation: works even when Firestorm gives a false viewport height.
+(function(){
+ const controls=document.getElementById('kkNavButtons');
+ const label=controls.querySelector('span');
+ const up=document.getElementById('kkPageUp'),down=document.getElementById('kkPageDown');
+ const sets={};
+ function setup(name,groups){
+   const root=document.getElementById(name);
+   const pages=[];
+   for(const group of groups){
+     const page=document.createElement('div');
+     page.className='kkDiscretePage';
+     for(const node of group)if(node)page.appendChild(node);
+     root.appendChild(page);pages.push(page);
+   }
+   sets[name]={pages,index:0};
+ }
+ const home=document.getElementById('home');
+ // Keep initial elements but divide them into compact screens with no height-dependent scrolling.
+ const hc=[...home.children];
+ setup('home',[[hc[0],hc[1],hc[2]],[hc[3],hc[4]],[hc[5]]]);
+ const cal=document.getElementById('calendar');
+ const cc=[...cal.children];
+ setup('calendar',[[cc[0],cc[1],cc[2]],[cc[3]]]);
+ function render(){
+   const active=document.querySelector('.view.active');
+   const section=active?.id;
+   const group=sets[section];
+   if(group){
+     group.pages.forEach((p,i)=>{p.style.display=i===group.index?'block':'none';});
+     label.textContent='Screen '+(group.index+1)+' of '+group.pages.length;
+     up.disabled=group.index===0;down.disabled=group.index===group.pages.length-1;
+   }else{
+     label.textContent='Page controls';
+     up.disabled=false;down.disabled=false;
+   }
+ }
+ function step(dir){
+   const active=document.querySelector('.view.active');
+   if(!active)return;
+   const group=sets[active.id];
+   if(group){group.index=Math.max(0,Math.min(group.pages.length-1,group.index+dir));active.scrollTop=0;render();}
+   else active.scrollTop+=dir*Math.max(200,active.clientHeight*.6);
+ }
+ // Replace previous up/down listeners by cloning buttons.
+ const newUp=up.cloneNode(true),newDown=down.cloneNode(true);
+ up.replaceWith(newUp);down.replaceWith(newDown);
+ newUp.addEventListener('click',()=>step(-1));
+ newDown.addEventListener('click',()=>step(1));
+ document.querySelectorAll('[data-view]').forEach(button=>button.addEventListener('click',()=>setTimeout(render,0)));
+ const homeObserver=new MutationObserver(render);
+ homeObserver.observe(home,{attributes:true,attributeFilter:['class']});
+ render();
 })();
 </script></body></html>
