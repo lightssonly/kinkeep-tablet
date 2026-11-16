@@ -134,6 +134,17 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
   <div id="choreSummary" class="summary">Loading household chores…</div>
   <div id="choreList" aria-live="polite"></div>
 </section>
+
+<section id="routineManager" style="border-top:1px solid #e7dfef;margin-top:24px;padding-top:18px">
+<h2>⏰ Youth & Teen Daily Routines</h2><p>Assign a routine to a registered Youth or Teen. Times use Second Life Time (Pacific). Routine display is connected; automated timed alerts are a separate upcoming feature.</p>
+<form id="routineForm"><label for="routinePerson">Member</label><select id="routinePerson" required style="width:100%;padding:11px;border-radius:10px"></select>
+<label for="routineLabel">Routine</label><input id="routineLabel" maxlength="150" placeholder="Brush teeth" required>
+<label for="routineTime">Time (SLT)</label><input id="routineTime" type="time" value="20:00" required style="font-size:15px;letter-spacing:normal;text-align:left">
+<label for="routineMessage">Reminder message (optional)</label><input id="routineMessage" maxlength="300" placeholder="Time to brush your teeth!">
+<fieldset style="margin-top:13px;border:1px solid #dfd4ed;border-radius:10px"><legend>Repeat on</legend><div id="routineDays" style="display:flex;flex-wrap:wrap;gap:12px;font-size:12px"><label><input type="checkbox" value="0" checked> Sun</label><label><input type="checkbox" value="1" checked> Mon</label><label><input type="checkbox" value="2" checked> Tue</label><label><input type="checkbox" value="3" checked> Wed</label><label><input type="checkbox" value="4" checked> Thu</label><label><input type="checkbox" value="5" checked> Fri</label><label><input type="checkbox" value="6" checked> Sat</label></div></fieldset>
+<button id="saveRoutine" type="submit">Save Routine</button></form>
+<button type="button" id="refreshRoutines" class="secondary">Refresh Routines</button><div id="routineStatus" role="status" aria-live="polite"></div><div id="routineList"></div>
+</section>
 </section>
 <footer>KinKeep v1.9 • Private Parent Family & Chore Manager • Shared MOAP remains read-only</footer>
 </main>
@@ -207,6 +218,7 @@ form.addEventListener('submit', async (event) => {
         document.getElementById('manager').hidden = false;
         void loadMembers();
         void loadChores();
+        void loadRoutines();
       }
     } else {
       statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
@@ -471,6 +483,40 @@ choreForm.addEventListener('submit', async event => {
   }
 });
 choreRefreshButton.addEventListener('click', () => { void loadChores(); });
+
+
+const routineEndpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-parent-routines';
+const routineStatus=document.getElementById('routineStatus');
+async function routineRequest(action,extra={}) {
+ if(!approvedSession||Date.now()>sessionDeadline)throw Error('Sign in again to manage routines.');
+ const res=await fetch(routineEndpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({action,session_token:approvedSession,...extra})});
+ const data=await res.json();if(!res.ok||data.ok!==true)throw Error(data.error||'Routine request failed');return data;
+}
+async function loadRoutines(){
+ if(!approvedSession)return;
+ try{
+  const data=await routineRequest('list');
+  const select=document.getElementById('routinePerson');const prior=select.value;select.replaceChildren();
+  for(const m of data.members){const opt=document.createElement('option');opt.value=m.id;opt.textContent=(m.profile_emoji||'⭐')+' '+m.display_name+' ('+m.role+')';select.append(opt)}
+  if(Array.from(select.options).some(o=>o.value===prior))select.value=prior;
+  const box=document.getElementById('routineList');box.replaceChildren();
+  for(const r of data.routines){const card=document.createElement('div');card.className='choreCard';
+   const owner=data.members.find(m=>m.id===r.member_id);
+   const description=document.createElement('p');description.textContent=(owner?owner.display_name:'Member')+' · '+r.label+' · '+String(r.time_slt).slice(0,5)+' SLT · '+(r.enabled?'Active':'Disabled');
+   card.append(description);
+   if(r.enabled){const b=document.createElement('button');b.type='button';b.textContent='Disable Routine';b.className='secondary';b.onclick=async()=>{if(!confirm('Disable this routine?'))return;b.disabled=true;try{await routineRequest('disable',{routine_id:r.id});await loadRoutines()}catch(e){routineStatus.textContent=e.message;b.disabled=false}};card.append(b)}
+   box.append(card)
+  }
+  routineStatus.textContent=data.routines.length+' routine(s) loaded.'; 
+ }catch(e){routineStatus.textContent=e.message}
+}
+document.getElementById('refreshRoutines').addEventListener('click',()=>void loadRoutines());
+document.getElementById('routineForm').addEventListener('submit',async e=>{
+ e.preventDefault();const button=document.getElementById('saveRoutine');button.disabled=true;
+ const days=[...document.querySelectorAll('#routineDays input:checked')].map(x=>Number(x.value));
+ try{await routineRequest('add',{member_id:document.getElementById('routinePerson').value,label:document.getElementById('routineLabel').value,reminder_message:document.getElementById('routineMessage').value,time_slt:document.getElementById('routineTime').value,days_of_week:days});document.getElementById('routineLabel').value='';document.getElementById('routineMessage').value='';await loadRoutines();routineStatus.textContent='Routine saved! Open a fresh Youth/Teen link to see it.'}
+ catch(err){routineStatus.textContent=err.message}finally{button.disabled=false}
+});
 
 window.addEventListener('pagehide', () => {
   approvedSession = null;
