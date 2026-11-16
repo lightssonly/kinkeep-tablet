@@ -145,6 +145,7 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="saveRoutine" type="submit">Save Routine</button></form>
 <button type="button" id="refreshRoutines" class="secondary">Refresh Routines</button><div id="routineStatus" role="status" aria-live="polite"></div><div id="routineList"></div>
 </section>
+<section id="privateParentHome" style="border-top:1px solid #e7dfef;margin-top:22px;padding-top:12px"><h2>🏡 Live Family Home</h2><p id="parentPinnedSummary" class="info">Loading pinned note…</p><div id="parentUpcomingSummary" class="info">Loading upcoming events…</div></section>
 <section id="sharedManager" style="border-top:1px solid #e7dfef;margin-top:25px;padding-top:14px"><h2>📝 Shared Family Notes</h2>
 <form id="newNoteForm"><label>Title<input id="sharedNoteTitle" maxlength="150" required placeholder="Family reminder"></label><label>Message<textarea id="sharedNoteMessage" maxlength="2000" required style="width:100%;height:90px"></textarea></label><label style="display:flex;gap:8px;align-items:center"><input id="sharedNotePinned" type="checkbox" style="width:auto"> Pin to family notes</label><button type="submit">Save Family Note</button></form><div id="sharedNotes"></div>
 <h2>📅 Family Calendar</h2><form id="newEventForm"><label>Event<input id="sharedEventTitle" maxlength="150" required placeholder="Anaya soccer game"></label><label>Date<input id="sharedEventDate" type="date" required style="font-size:14px;letter-spacing:normal;text-align:left"></label><label>Details<input id="sharedEventDetails" maxlength="1000" placeholder="Optional location or details"></label><button type="submit">Add Calendar Event</button></form><div id="sharedEvents"></div><p id="sharedStatus" role="status"></p><button type="button" class="secondary" id="refreshShared">Refresh Notes & Calendar</button></section></section>
@@ -548,6 +549,13 @@ async function loadShared(){
    b.onclick=async()=>{if(!confirm('Delete event?'))return;b.disabled=true;try{await sharedCall('delete_event',{id:e.id});await loadShared()}catch(e){sharedStatus.textContent=e.message;b.disabled=false}};
    card.append(b);events.append(card);
   });
+  const pinned=d.notes.find(n=>n.is_pinned);
+  document.getElementById('parentPinnedSummary').textContent=pinned?'📌 '+pinned.title+' — '+pinned.message:'No pinned note yet.';
+  const dates=new Intl.DateTimeFormat('en-US',{timeZone:'America/Los_Angeles',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+  const part=k=>dates.find(x=>x.type===k)?.value||'';
+  const today=part('year')+'-'+part('month')+'-'+part('day');
+  const upcoming=d.events.filter(x=>x.event_date>=today).slice(0,5);
+  document.getElementById('parentUpcomingSummary').textContent=upcoming.length?'📅 '+upcoming.map(e=>e.event_date+' · '+e.title).join(' | '):'No upcoming events.';
   sharedStatus.textContent=d.notes.length+' family notes · '+d.events.length+' calendar events';
  }catch(e){sharedStatus.textContent=e.message}
 }
