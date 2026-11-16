@@ -73,6 +73,7 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <p id="status" aria-live="polite"></p>
 
 <section id="manager" hidden>
+<button type="button" class="secondary" id="closeParentAccess">Close Parent Access</button>
 <h2>🏡 Parent Family Manager</h2>
 <p>You're signed in as the registered owner. Add real family members to your KinKeep household. Changes here are stored in Supabase—not the demo Family editor.</p>
 <div class="info">🔒 Only your registered Parent session can make changes. This first version adds Youth, Teen, Adult, Caregiver, or Custom members. Additional Parent enrollment will have its own secure flow.</div>
@@ -148,6 +149,19 @@ let ticket = match ? match[1].toLowerCase() : null;
 // The server session stays only in this page's memory. It is not saved in
 // a cookie, URL, localStorage, or the public/shared in-world media browser.
 let approvedSession = null;
+let sessionDeadline = 0;
+let sessionTimer = null;
+function closeAccess() {
+  approvedSession = null;
+  sessionDeadline = 0;
+  if (sessionTimer !== null) clearTimeout(sessionTimer);
+  sessionTimer = null;
+  document.getElementById("manager").hidden = true;
+}
+document.getElementById("closeParentAccess").addEventListener("click", () => {
+  closeAccess();
+  statusLine.textContent = "Parent Access closed in this tab. Server session expires separately.";
+});
 if (ticket) {
   try { history.replaceState(null, '', location.pathname); } catch { /* no persistence */ }
   notice.textContent = 'Registered owner verified. Enter your four-digit Parent PIN.';
@@ -175,6 +189,15 @@ form.addEventListener('submit', async (event) => {
     const result = await response.json().catch(() => ({}));
     if (response.ok && result.ok === true && result.verified === true) {
       approvedSession = typeof result.session_token === 'string' ? result.session_token : null;
+      if (approvedSession) {
+        const seconds = Math.min(600, Math.max(1, Number(result.expires_in_seconds) || 600));
+        sessionDeadline = Date.now() + seconds * 1000;
+        if (sessionTimer !== null) clearTimeout(sessionTimer);
+        sessionTimer = setTimeout(() => {
+          closeAccess();
+          statusLine.textContent = 'Parent session expired. Please sign in again.';
+        }, seconds * 1000);
+      }
       ticket = null;
       form.reset();
       form.hidden = true;
