@@ -215,7 +215,7 @@ const memberList = document.getElementById('memberList');
 const memberStatus = document.getElementById('memberStatus');
 const addMember = document.getElementById('addMember');
 
-async function familyRequest(action, data = {}) {
+async function familyRequest body: JSON.stringify({ module: 'family', action, session_token: approvedSession, ...data }),
   if (!approvedSession) throw new Error('Sign in again to manage your family.');
   const res = await fetch(familyEndpoint, {
     method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
@@ -298,7 +298,7 @@ const choreSummary = document.getElementById('choreSummary');
 const choreAssignButton = document.getElementById('choreAssignButton');
 const choreRefreshButton = document.getElementById('refreshChores');
 
-async function choreRequest(action, data = {}) {
+async function choreRequest body: JSON.stringify({ module: 'chores', action, session_token: approvedSession, ...data }),
   if (!approvedSession) throw new Error('Sign in again to manage chores.');
   const res = await fetch(choreEndpoint, {
     method: 'POST', mode: 'cors', cache: 'no-store', referrerPolicy: 'no-referrer',
