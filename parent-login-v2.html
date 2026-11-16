@@ -71,10 +71,13 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="submit" type="submit">Verify Parent PIN</button>
 </form>
 <p id="status" aria-live="polite"></p>
+<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-v4-calendar-test.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#eee8f5;color:#503b7b;padding:13px;border-radius:12px;text-decoration:none;font-weight:750;margin:12px 0">🏡 Open Tablet Home Screen</a>
 
 <section id="manager" hidden>
+<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-v4-calendar-test.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#7457aa;color:white;padding:14px;border-radius:12px;text-decoration:none;font-weight:800;margin:8px 0">🏡 Open Tablet Home Screen</a>
+<p class="help">The tablet Home Screen and private Parent Settings are separate pages. Open Home above; stay here to manage family data.</p>
 <button type="button" class="secondary" id="closeParentAccess">Close Parent Access</button>
-<nav style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0 14px"><button type="button" class="secondary" onclick="document.getElementById('privateParentHome').scrollIntoView({block:'start'})">🏡 Family Home</button><button type="button" class="secondary" onclick="document.getElementById('sharedManager').scrollIntoView({block:'start'})">📝 Notes & Calendar</button></nav>
+<nav style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0 14px"><button type="button" class="secondary" onclick="document.getElementById('privateParentHome').scrollIntoView({block:'start'})">📌 Family Summary</button><button type="button" class="secondary" onclick="document.getElementById('sharedManager').scrollIntoView({block:'start'})">📝 Notes & Calendar</button></nav>
 <section id="privateParentHome" style="border-top:1px solid #e7dfef;margin-top:22px;padding-top:12px"><h2>🏡 Live Family Home</h2><p id="parentPinnedSummary" class="info">Loading pinned note…</p><div id="parentUpcomingSummary" class="info">Loading upcoming events…</div></section>
 <h2>🏡 Parent Family Manager</h2>
 <p>You're signed in as the registered owner. Add real family members to your KinKeep household. Changes here are stored in Supabase—not the demo Family editor.</p>
