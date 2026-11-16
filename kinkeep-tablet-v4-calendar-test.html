@@ -21,8 +21,33 @@ html,body{height:100%;overflow:hidden}body{padding:0}.shell{height:100dvh;min-he
 #kkScrollControls button{border:2px solid #fff;background:#6d4aa1;color:#fff;border-radius:12px;width:48px;height:46px;font:bold 22px Arial,sans-serif;box-shadow:0 3px 10px #0004;cursor:pointer}
 #kkScrollControls button:active{background:#42266e}
 .shell{padding-right:58px!important}
+
+/* v1.7 Home: one readable, non-scrolling tablet dashboard. Apps retain independent scroll. */
+#home.active{display:grid!important;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto auto;gap:7px;align-content:start;overflow:hidden!important;padding:2px 3px 5px}
+#home>.home-jump{display:none!important}
+#home>.hero{grid-column:1 / -1;padding:7px 12px!important;margin:0!important}
+#home>.hero h1{font-size:23px!important;margin:1px 0!important}
+#home>.hero .small{font-size:10px}
+#home>.card:has(.apps){grid-column:1 / -1;padding:7px 10px!important;margin:0!important}
+#home .apps{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+#home .app{min-height:42px!important;padding:3px 2px!important;font-size:12px}
+#home .app .em{font-size:16px!important;margin:0!important}
+#home #homePinCard{grid-column:1;padding:8px!important;margin:0!important;min-width:0}
+#home #homePinCard .note{padding:7px}
+#home #homePinCard .note p{font-size:11px;line-height:1.25}
+#home .grid2.home-extra{grid-column:2;display:grid!important;grid-template-columns:1fr;gap:5px;margin:0!important;min-width:0}
+#home .grid2.home-extra .tile{padding:6px 8px}
+#home .grid2.home-extra .tile p{font-size:11px;margin:2px 0}
+#home .card.home-optional{grid-column:1 / -1;display:block!important;padding:7px 10px!important;margin:0!important}
+#home .people{grid-template-columns:repeat(4,1fr)}
+#home .person{padding:3px 1px!important}
+#home .person span{font-size:15px!important}
+#home .home-optional .muted{display:none}
+#home h2{font-size:13px!important;margin:0 0 4px!important}
+#home .smallbtn{padding:3px 6px!important;font-size:10px!important}
+@media(max-height:620px){#home.active{gap:4px}#home .hero{padding:5px 8px!important}#home .hero .small{display:none}#home .app{min-height:37px!important}#home .person span{font-size:12px!important}}
 </style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen <strong style="color:#6946a0">· v1.5</strong></div></div><div class="chip" id="slt">SLT · --:--</div></div>
-<div id="kkNavButtons" style="display:flex;gap:9px;align-items:center;justify-content:flex-end;padding:4px 0 7px;flex-shrink:0"><span style="margin-right:auto;font-size:12px;font-weight:bold;color:#4d3577">Screen controls v1.5</span><button id="kkPageUp" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▲ UP</button><button id="kkPageDown" type="button" style="padding:9px 18px;background:#7149aa;color:white;border-radius:11px;border:2px solid white;font-weight:bold">▼ DOWN</button></div><section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
+<section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
 <div class="card"><h2>My Apps ✨</h2><div class="apps"><button class="app" data-view="chores"><span class="em">🧹</span>Chores</button><button class="app" data-view="family"><span class="em">🏡</span>Family</button><button class="app" data-view="calendar"><span class="em">📅</span>Calendar</button><button class="app" data-view="rewards"><span class="em">⭐</span>Rewards</button><button class="app" data-view="notes"><span class="em">💌</span>Notes</button><button class="app" data-view="settings"><span class="em">⚙️</span>Settings</button></div></div>
 <div class="card" id="homePinCard"><div class="between"><h2>📌 Family Note</h2><button class="secondary smallbtn" data-view="notes">Open Notes</button></div><div class="note"><div class="between"><strong id="pinnedTitle">Demo Home Note 💛</strong><span>💌</span></div><p id="pinnedText">Real family notes are available in your private KinKeep dashboard.</p><div class="sub" id="pinnedFrom">KinKeep · Demo only</div></div></div>
 <div class="grid2 home-extra"><div class="tile"><strong>🌞 Today's Routine</strong><p class="muted">Daily routine setup is coming.</p></div><div class="tile" id="homeComingCard"><strong>📅 Coming Up</strong><div id="homeEvents" class="stack" style="margin-top:8px"><p class="muted">No upcoming events yet.</p></div><button class="secondary smallbtn" data-view="calendar" style="margin-top:9px">Open Calendar</button></div></div>
@@ -89,22 +114,5 @@ function safeSharedHome(){
  const msg=document.createElement('p');msg.className='muted';msg.textContent='Your actual upcoming events appear in the private Family Home.';$('homeEvents').append(msg);
 }
 safeSharedHome();
-
-document.getElementById('kkPageUp').addEventListener('click',()=>{const p=document.querySelector('.view.active');if(p)p.scrollTop=Math.max(0,p.scrollTop-Math.max(150,p.clientHeight*0.65));});
-document.getElementById('kkPageDown').addEventListener('click',()=>{const p=document.querySelector('.view.active');if(p)p.scrollTop+=Math.max(150,p.clientHeight*0.65);});
-// Scroll buttons target the active page, even when Firestorm does not forward wheel events.
-(function(){
- const controls=document.createElement('div');controls.id='kkScrollControls';
- const up=document.createElement('button'),down=document.createElement('button');
- up.type=down.type='button';up.textContent='▲';down.textContent='▼';
- up.setAttribute('aria-label','Scroll page up');down.setAttribute('aria-label','Scroll page down');
- controls.append(up,down);document.body.append(controls);
- function scrollPage(direction){
-   const panel=document.querySelector('.view.active');if(!panel)return;
-   const distance=Math.max(180,Math.round(panel.clientHeight*0.6));
-   panel.scrollTop=Math.max(0,Math.min(panel.scrollHeight-panel.clientHeight,panel.scrollTop+direction*distance));
- }
- up.addEventListener('click',()=>scrollPage(-1));down.addEventListener('click',()=>scrollPage(1));
-})();
 
 </script></body></html>
