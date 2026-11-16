@@ -51,6 +51,7 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
 <h2>Daily Goals 🎯</h2><div id="goalSummary"></div>
 <div id="teenGoalForm" class="submitArea" hidden><label for="goalTitle">New teen daily goal</label><input id="goalTitle" placeholder="Read a book" maxlength="150" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><label for="goalMinutes">Target minutes</label><input id="goalMinutes" type="number" min="1" max="1440" value="20" style="width:100%;padding:10px;border:1px solid #c9bcde;border-radius:9px"><button id="addGoalBtn" type="button" style="margin-top:10px;border:0;border-radius:10px;background:#7251a5;color:#fff;padding:11px 15px;font-weight:bold">Add My Goal</button></div>
 <p id="hubMessage" class="notice" role="status"></p></section>
+<section id="familyShared" hidden><h2>📌 Family Notes</h2><div id="familySharedNotes" class="notice"></div><h2>📅 Family Calendar</h2><div id="familySharedEvents" class="notice"></div><p id="familySharedStatus" class="meta"></p></section>
 <footer>KinKeep v2.0 · Private view · Never share your login link</footer>
 </main>
 <script>
@@ -131,6 +132,7 @@ async function load(){
   status.textContent='Your private chore list is ready. Only this registered avatar’s chores were retrieved.';
   content.hidden=false;
   void loadHub();
+  void loadFamilyShared();
  }catch(e){status.textContent=(e instanceof Error?e.message:'Could not load your chores')+' — Request a new private link from Second Life.';}
 }
 
@@ -182,6 +184,23 @@ document.getElementById('addGoalBtn').addEventListener('click',async()=>{
  catch(e){hubMessage.textContent=e.message}finally{b.disabled=false}
 });
 
+const sharedEndpoint='https://qnbnxgaxciqcsszfwsly.supabase.co/functions/v1/kinkeep-family-shared';
+async function loadFamilyShared(){
+ if(!submitToken||Date.now()>expiresAt)return;
+ const container=document.getElementById('familyShared'),msg=document.getElementById('familySharedStatus');
+ try{
+  const r=await fetch(sharedEndpoint,{method:'POST',mode:'cors',cache:'no-store',headers:{'content-type':'application/json'},body:JSON.stringify({scope:'youth',action:'list',session_token:submitToken})});
+  const d=await r.json();if(!r.ok||d.ok!==true)throw Error(d.error||'Could not load family data');
+  const notes=document.getElementById('familySharedNotes');notes.replaceChildren();
+  const pinned=d.notes.filter(x=>x.is_pinned),remaining=d.notes.filter(x=>!x.is_pinned);
+  for(const n of [...pinned,...remaining])notes.append(el('p','',(n.is_pinned?'📌 ':'')+n.title+' — '+n.message));
+  if(!d.notes.length)notes.textContent='No shared family notes yet.';
+  const events=document.getElementById('familySharedEvents');events.replaceChildren();
+  for(const e of d.events)events.append(el('p','',e.event_date+' · '+e.title+(e.details?' — '+e.details:'')));
+  if(!d.events.length)events.textContent='No calendar events yet.';
+  msg.textContent='Shared notes and calendar loaded privately.';container.hidden=false;
+ }catch(e){msg.textContent=e.message;container.hidden=false}
+}
 load();
 </script>
 </body></html>
