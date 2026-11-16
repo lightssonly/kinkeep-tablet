@@ -237,7 +237,7 @@ async function familyRequest(action, data = {}) {
 async function loadMembers() {
   memberStatus.textContent = 'Refreshing registered family…';
   try {
-   
+    const result = await familyRequest('list');
     memberList.replaceChildren();
     const members = Array.isArray(result.members) ? result.members : [];
     if (!members.length) {
