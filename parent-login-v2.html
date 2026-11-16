@@ -74,6 +74,8 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 
 <section id="manager" hidden>
 <button type="button" class="secondary" id="closeParentAccess">Close Parent Access</button>
+<nav style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0 14px"><button type="button" class="secondary" onclick="document.getElementById('privateParentHome').scrollIntoView({block:'start'})">🏡 Family Home</button><button type="button" class="secondary" onclick="document.getElementById('sharedManager').scrollIntoView({block:'start'})">📝 Notes & Calendar</button></nav>
+<section id="privateParentHome" style="border-top:1px solid #e7dfef;margin-top:22px;padding-top:12px"><h2>🏡 Live Family Home</h2><p id="parentPinnedSummary" class="info">Loading pinned note…</p><div id="parentUpcomingSummary" class="info">Loading upcoming events…</div></section>
 <h2>🏡 Parent Family Manager</h2>
 <p>You're signed in as the registered owner. Add real family members to your KinKeep household. Changes here are stored in Supabase—not the demo Family editor.</p>
 <div class="info">🔒 Only your registered Parent session can make changes. This first version adds Youth, Teen, Adult, Caregiver, or Custom members. Additional Parent enrollment will have its own secure flow.</div>
@@ -145,7 +147,6 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="saveRoutine" type="submit">Save Routine</button></form>
 <button type="button" id="refreshRoutines" class="secondary">Refresh Routines</button><div id="routineStatus" role="status" aria-live="polite"></div><div id="routineList"></div>
 </section>
-<section id="privateParentHome" style="border-top:1px solid #e7dfef;margin-top:22px;padding-top:12px"><h2>🏡 Live Family Home</h2><p id="parentPinnedSummary" class="info">Loading pinned note…</p><div id="parentUpcomingSummary" class="info">Loading upcoming events…</div></section>
 <section id="sharedManager" style="border-top:1px solid #e7dfef;margin-top:25px;padding-top:14px"><h2>📝 Shared Family Notes</h2>
 <form id="newNoteForm"><label>Title<input id="sharedNoteTitle" maxlength="150" required placeholder="Family reminder"></label><label>Message<textarea id="sharedNoteMessage" maxlength="2000" required style="width:100%;height:90px"></textarea></label><label style="display:flex;gap:8px;align-items:center"><input id="sharedNotePinned" type="checkbox" style="width:auto"> Pin to family notes</label><button type="submit">Save Family Note</button></form><div id="sharedNotes"></div>
 <h2>📅 Family Calendar</h2><form id="newEventForm"><label>Event<input id="sharedEventTitle" maxlength="150" required placeholder="Anaya soccer game"></label><label>Date<input id="sharedEventDate" type="date" required style="font-size:14px;letter-spacing:normal;text-align:left"></label><label>Details<input id="sharedEventDetails" maxlength="1000" placeholder="Optional location or details"></label><button type="submit">Add Calendar Event</button></form><div id="sharedEvents"></div><p id="sharedStatus" role="status"></p><button type="button" class="secondary" id="refreshShared">Refresh Notes & Calendar</button></section></section>
@@ -223,6 +224,7 @@ form.addEventListener('submit', async (event) => {
         void loadChores();
         void loadRoutines();
         void loadShared();
+        document.getElementById('privateParentHome').scrollIntoView({block:'start'});
       }
     } else {
       statusLine.textContent = typeof result.error === 'string' ? result.error : 'Could not verify Parent login. Try again.';
