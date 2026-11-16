@@ -46,7 +46,24 @@ html,body{height:100%;overflow:hidden}body{padding:0}.shell{height:100dvh;min-he
 #home h2{font-size:13px!important;margin:0 0 4px!important}
 #home .smallbtn{padding:3px 6px!important;font-size:10px!important}
 @media(max-height:620px){#home.active{gap:4px}#home .hero{padding:5px 8px!important}#home .hero .small{display:none}#home .app{min-height:37px!important}#home .person span{font-size:12px!important}}
-</style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen <strong style="color:#6946a0">· v1.5</strong></div></div><div class="chip" id="slt">SLT · --:--</div></div>
+
+/* KinKeep Home 1.8 - full-width, readable pastel layout */
+html,body{background:#eee7f5!important;color:#302943!important}
+.shell{max-width:none!important;width:100%!important;background:linear-gradient(135deg,#fff0f5,#eee8ff 55%,#dff4ff)!important;padding:12px 20px!important}
+#home.active{width:100%;grid-template-columns:1.1fr 1fr;gap:10px!important}
+#home>.hero{background:linear-gradient(115deg,#8b6bc0,#6989bb)!important;border-radius:18px!important;padding:10px 18px!important;color:white!important}
+#home>.hero h1{font-size:30px!important}
+#home #homeAppsCard,#home #homePinCard,#home .card.home-optional,#home .tile{background:#fffcff!important;color:#322948!important;border:1px solid #e7def0!important;border-radius:16px!important}
+#home h2{font-size:17px!important}
+#home .app{background:#f7f2ff!important;color:#3c3155!important;min-height:60px!important;font-size:15px!important;border-radius:13px!important}
+#home .app .em{font-size:24px!important}
+#home #homePinCard .note{background:#fff2d7!important;color:#564124!important}
+#home #homePinCard .note p{font-size:13px!important}
+#home .people{gap:9px!important}
+#home .person{background:#f7f2ff!important;color:#403251!important;font-size:13px!important;padding:8px 3px!important}
+#home .person span{font-size:21px!important}
+@media(max-height:720px){#home>.hero{padding:6px 12px!important}#home>.hero h1{font-size:24px!important}#home .app{min-height:45px!important;font-size:13px!important}#home .app .em{font-size:18px!important}#home .person{padding:4px 2px!important}}
+</style></head><body><main class="shell"><div class="head"><div><div class="logo">✿ KinKeep</div><div class="tiny muted">Family Studio · Shared Screen <strong style="color:#6946a0">· Home v1.8</strong></div></div><div class="chip" id="slt">SLT · --:--</div></div>
 <section id="home" class="view active"><div class="card home-jump" style="padding:9px;margin:5px 0"><div class="between"><strong style="font-size:12px">Jump to</strong><button type="button" class="secondary smallbtn" data-jump="homePinCard">📌 Note</button><button type="button" class="secondary smallbtn" data-jump="homeComingCard">📅 Events</button></div><p class="tiny muted" style="margin:5px 0 0">Shared screen previews only. Real family records are in private dashboards.</p></div><div class="hero"><div class="between"><strong>Welcome Home! ♡</strong><span>🏡</span></div><h1 id="clock">--:--</h1><div id="date" class="small">Loading date…</div><div class="small" style="margin-top:10px">☁ Weather · Demo</div></div>
 <div class="card" id="homeAppsCard"><h2>My Apps ✨</h2><div class="apps"><button class="app" data-view="chores"><span class="em">🧹</span>Chores</button><button class="app" data-view="family"><span class="em">🏡</span>Family</button><button class="app" data-view="calendar"><span class="em">📅</span>Calendar</button><button class="app" data-view="rewards"><span class="em">⭐</span>Rewards</button><button class="app" data-view="notes"><span class="em">💌</span>Notes</button><button class="app" data-view="settings"><span class="em">⚙️</span>Settings</button></div></div>
 <div class="card" id="homePinCard"><div class="between"><h2>📌 Family Note</h2><button class="secondary smallbtn" data-view="notes">Open Notes</button></div><div class="note"><div class="between"><strong id="pinnedTitle">Demo Home Note 💛</strong><span>💌</span></div><p id="pinnedText">Real family notes are available in your private KinKeep dashboard.</p><div class="sub" id="pinnedFrom">KinKeep · Demo only</div></div></div>
