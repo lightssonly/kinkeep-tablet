@@ -32,7 +32,7 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
 .submitArea button:disabled{opacity:.5;cursor:wait}
 .submitArea .result{font-size:12px;color:#4c4472;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
 
-#kkYouthNav button{border:1px solid #d9cbed;border-radius:10px;background:#f4edff;color:#523b7d;font-weight:750;padding:9px 3px;font-size:12px;cursor:pointer}#kkYouthNav button:focus-visible{outline:2px solid #7251a5}#content,#youthHub,#familyShared,#privateFamilyHome,#rewardSummary,#routineSummary,#goalSummary{scroll-margin-top:100px}
+#kkYouthNav button{border:1px solid #d9cbed;border-radius:10px;background:#f4edff;color:#523b7d;font-weight:750;padding:9px 3px;font-size:12px;cursor:pointer}#kkYouthNav button:focus-visible{outline:2px solid #7251a5}#kkYouthNav button[aria-current='page']{background:#7456aa;color:#fff}#content,#youthHub,#familyShared,#privateFamilyHome,#rewardSummary,#routineSummary,#goalSummary{scroll-margin-top:100px}
 </style>
 </head>
 <body><main>
@@ -214,7 +214,7 @@ async function loadFamilyShared(){
   msg.textContent='Shared notes and calendar loaded privately.';container.hidden=false;
  }catch(e){msg.textContent=e.message;container.hidden=false}
 }
-document.querySelectorAll('[data-youth-go]').forEach(b=>b.addEventListener('click',()=>{const target=document.getElementById(b.dataset.youthGo);if(target&&!target.hidden)target.scrollIntoView({block:'start'});}));
+document.querySelectorAll('[data-youth-go]').forEach(b=>b.addEventListener('click',()=>{const target=document.getElementById(b.dataset.youthGo);if(target&&!target.hidden){target.scrollIntoView({block:'start',behavior:'auto'});b.setAttribute('aria-current','page');document.querySelectorAll('[data-youth-go]').forEach(other=>{if(other!==b)other.removeAttribute('aria-current');});}}));
 const youthNavObserver=new MutationObserver(()=>{document.getElementById('kkYouthNav').hidden=!(submitToken&&Date.now()<expiresAt&&(content.hidden===false));});
 youthNavObserver.observe(content,{attributes:true,attributeFilter:['hidden']});
 
