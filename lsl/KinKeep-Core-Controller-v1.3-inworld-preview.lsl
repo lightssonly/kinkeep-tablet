@@ -190,10 +190,10 @@ default
             integer count = llGetListLength(llJson2List(llJsonGetValue(body, ["chores"])));
             string output = "KinKeep - " + name + "'s Chores";
             integer i;
-            for (i = 0; i < count && i < 12; ++i) {
+            for (i = 0; i < count && i < 6; ++i) {
                 string title = llJsonGetValue(body, ["chores", i, "title"]);
                 string statusText = llJsonGetValue(body, ["chores", i, "status"]);
-                output += "\\n" + (string)(i + 1) + ". " + llGetSubString(title, 0, 45) + " [" + statusText + "]";
+                output += "\\n" + (string)(i + 1) + ". " + llGetSubString(title, 0, 35) + " [" + statusText + "]";
             }
             if (count == 0) output += "\\nNo chores assigned yet.";
             llDialog(who, output, ["OK", "My Chores", "Close"], MENU_CHANNEL);
