@@ -24,7 +24,7 @@ button:disabled{opacity:.6;cursor:default}
 footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 
 /* v1.5 private Family Manager */
-#manager{border-top:1px solid #e8e0ef;margin-top:20px;padding-top:14px}
+#manager{border-top:1px solid #e8e0ef;margin-top:20px;padding-top:14px;scroll-margin-top:80px}#manager section,#memberList{scroll-margin-top:105px}#kkParentNav button{margin:0!important;padding:8px 3px!important;font-size:12px!important;letter-spacing:normal}
 #manager h2{font-size:21px;margin:8px 0 5px}
 #manager h3{font-size:16px;margin:16px 0 6px}
 #manager label{margin:11px 0 5px}
@@ -71,10 +71,18 @@ footer{font-size:11px;color:#8d839c;margin-top:15px;text-align:center}
 <button id="submit" type="submit">Verify Parent PIN</button>
 </form>
 <p id="status" aria-live="polite"></p>
-<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-v4-calendar-test.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#eee8f5;color:#503b7b;padding:13px;border-radius:12px;text-decoration:none;font-weight:750;margin:12px 0">🏡 Open Tablet Home Screen</a>
+<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-home-v18-live.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#eee8f5;color:#503b7b;padding:13px;border-radius:12px;text-decoration:none;font-weight:750;margin:12px 0">🏡 Open Tablet Home Screen</a>
 
 <section id="manager" hidden>
-<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-v4-calendar-test.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#7457aa;color:white;padding:14px;border-radius:12px;text-decoration:none;font-weight:800;margin:8px 0">🏡 Open Tablet Home Screen</a>
+<nav id="kkParentNav" aria-label="Parent app navigation" style="position:sticky;top:0;z-index:10;background:#fff;padding:8px 0 10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;border-bottom:1px solid #e8e0ef">
+<button type="button" data-parent-destination="privateParentHome" class="secondary">🏡 Home</button>
+<button type="button" data-parent-destination="choresManager" class="secondary">🧹 Chores</button>
+<button type="button" data-parent-destination="routineManager" class="secondary">⏰ Routines</button>
+<button type="button" data-parent-destination="sharedManager" class="secondary">💌 Notes</button>
+<button type="button" data-parent-destination="sharedManager" class="secondary">📅 Calendar</button>
+<button type="button" data-parent-destination="memberList" class="secondary">👪 Family</button>
+</nav>
+<a href="https://lightssonly.github.io/kinkeep-tablet/kinkeep-tablet-home-v18-live.html" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#7457aa;color:white;padding:14px;border-radius:12px;text-decoration:none;font-weight:800;margin:8px 0">🏡 Open Tablet Home Screen</a>
 <p class="help">The tablet Home Screen and private Parent Settings are separate pages. Open Home above; stay here to manage family data.</p>
 <button type="button" class="secondary" id="closeParentAccess">Close Parent Access</button>
 <nav style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:8px 0 14px"><button type="button" class="secondary" onclick="document.getElementById('privateParentHome').scrollIntoView({block:'start'})">📌 Family Summary</button><button type="button" class="secondary" onclick="document.getElementById('sharedManager').scrollIntoView({block:'start'})">📝 Notes & Calendar</button></nav>
@@ -572,6 +580,13 @@ document.getElementById('newNoteForm').onsubmit=async e=>{
 document.getElementById('newEventForm').onsubmit=async e=>{
  e.preventDefault();try{await sharedCall('add_event',{title:document.getElementById('sharedEventTitle').value,event_date:document.getElementById('sharedEventDate').value,details:document.getElementById('sharedEventDetails').value});e.target.reset();await loadShared()}catch(x){sharedStatus.textContent=x.message}
 };
+document.querySelectorAll('[data-parent-destination]').forEach(button=>{
+ button.addEventListener('click',()=>{
+   if(!approvedSession||Date.now()>sessionDeadline){closeAccess();return;}
+   const target=document.getElementById(button.dataset.parentDestination);
+   if(target)target.scrollIntoView({block:'start',behavior:'auto'});
+ });
+});
 window.addEventListener('pagehide', () => {
   approvedSession = null;
   ticket = null;
