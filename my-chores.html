@@ -32,13 +32,16 @@ footer{text-align:center;color:#80758e;font-size:11px;margin-top:20px}
 .submitArea button:disabled{opacity:.5;cursor:wait}
 .submitArea .result{font-size:12px;color:#4c4472;margin-top:8px;white-space:pre-wrap;overflow-wrap:anywhere}
 
+#kkYouthNav button{border:1px solid #d9cbed;border-radius:10px;background:#f4edff;color:#523b7d;font-weight:750;padding:9px 3px;font-size:12px;cursor:pointer}#kkYouthNav button:focus-visible{outline:2px solid #7251a5}#content,#youthHub,#familyShared,#privateFamilyHome,#rewardSummary,#routineSummary,#goalSummary{scroll-margin-top:100px}
 </style>
 </head>
 <body><main>
 <div class="brand">✿ KinKeep · PRIVATE FAMILY VIEW</div>
 <h1>My Chores 🧹</h1>
 <p id="status" class="notice" role="status" aria-live="polite">Checking your one-time private link…</p>
-<section id="content" hidden>
+<nav id="kkYouthNav" hidden aria-label="Youth tablet navigation" style="position:sticky;top:0;z-index:20;background:#fff;padding:9px 0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;border-bottom:1px solid #e2d8f0">
+<button type="button" data-youth-go="privateFamilyHome">🏡 Home</button><button type="button" data-youth-go="content">🧹 Chores</button><button type="button" data-youth-go="rewardSummary">⭐ Rewards</button><button type="button" data-youth-go="routineSummary">⏰ Routines</button><button type="button" data-youth-go="goalSummary">🎯 Goals</button><button type="button" data-youth-go="familyShared">📅 Family</button>
+</nav><section id="content" hidden>
   <div id="member" class="member"></div>
   <h2>Your assigned chores</h2>
   <div id="list"></div>
@@ -211,6 +214,10 @@ async function loadFamilyShared(){
   msg.textContent='Shared notes and calendar loaded privately.';container.hidden=false;
  }catch(e){msg.textContent=e.message;container.hidden=false}
 }
+document.querySelectorAll('[data-youth-go]').forEach(b=>b.addEventListener('click',()=>{const target=document.getElementById(b.dataset.youthGo);if(target&&!target.hidden)target.scrollIntoView({block:'start'});}));
+const youthNavObserver=new MutationObserver(()=>{document.getElementById('kkYouthNav').hidden=!(submitToken&&Date.now()<expiresAt&&(content.hidden===false));});
+youthNavObserver.observe(content,{attributes:true,attributeFilter:['hidden']});
+
 load();
 </script>
 </body></html>
